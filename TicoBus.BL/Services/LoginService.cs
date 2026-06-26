@@ -15,11 +15,11 @@ namespace TicoBus.BL.Services
             _correoService = correoService;
         }
 
-        public Usuario? Login(string nombre, string clave, out string mensaje)
+        public Usuario? Login(string nombreUsuario, string clave, out string mensaje)
         {
             mensaje = string.Empty;
 
-            var usuario = _usuarioRepository.ObtenerPorNombre(nombre);
+            var usuario = _usuarioRepository.ObtenerPorNombreUsuario(nombreUsuario);
 
             if (usuario == null)
             {
@@ -32,7 +32,7 @@ namespace TicoBus.BL.Services
                 usuario.BloqueadoHasta > DateTime.Now)
             {
                 var cuerpoBloqueado =
-                    $"La cuenta {usuario.Nombre} está bloqueada por 3 minutos. " +
+                    $"La cuenta {usuario.NombreUsuario} está bloqueada por 3 minutos. " +
                     $"Puede reintentar el {usuario.BloqueadoHasta.Value:dd/MM/yyyy} a las {usuario.BloqueadoHasta.Value:HH:mm}.";
 
                 _correoService.EnviarCorreo(usuario.Correo, "Cuenta bloqueada", cuerpoBloqueado);
@@ -53,7 +53,7 @@ namespace TicoBus.BL.Services
                         usuario.IntentosFallidos = 0;
 
                         var cuerpo =
-                            $"La cuenta {usuario.Nombre} está bloqueada por 3 minutos. " +
+                            $"La cuenta {usuario.NombreUsuario} está bloqueada por 3 minutos. " +
                             $"Puede reintentar el {usuario.BloqueadoHasta.Value:dd/MM/yyyy} a las {usuario.BloqueadoHasta.Value:HH:mm}.";
 
                         _correoService.EnviarCorreo(usuario.Correo, "Cuenta bloqueada", cuerpo);
@@ -62,7 +62,7 @@ namespace TicoBus.BL.Services
                     _usuarioRepository.Actualizar(usuario);
                 }
 
-                mensaje = "Nombre o clave incorrectos.";
+                mensaje = "Usuario o clave incorrectos.";
                 return null;
             }
 
@@ -75,16 +75,16 @@ namespace TicoBus.BL.Services
 
             _correoService.EnviarCorreo(
                 usuario.Correo,
-                $"Inicio de sesión — {usuario.Nombre}",
+                $"Inicio de sesión — {usuario.NombreUsuario}",
                 cuerpoInicio);
 
             mensaje = "Inicio de sesión correcto.";
             return usuario;
         }
 
-        public bool CambiarClave(string nombre, string claveActual, string nuevaClave, out string mensaje)
+        public bool CambiarClave(string nombreUsuario, string claveActual, string nuevaClave, out string mensaje)
         {
-            var usuario = _usuarioRepository.ObtenerPorNombre(nombre);
+            var usuario = _usuarioRepository.ObtenerPorNombreUsuario(nombreUsuario);
 
             if (usuario == null)
             {
@@ -106,7 +106,7 @@ namespace TicoBus.BL.Services
 
             _correoService.EnviarCorreo(
                 usuario.Correo,
-                $"Cambio de clave — {usuario.Nombre}",
+                $"Cambio de clave — {usuario.NombreUsuario}",
                 cuerpo);
 
             mensaje = "Clave actualizada correctamente.";

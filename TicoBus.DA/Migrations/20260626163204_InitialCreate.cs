@@ -50,7 +50,8 @@ namespace TicoBus.DA.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NombreUsuario = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NombreCompleto = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Clave = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Correo = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     Rol = table.Column<int>(type: "int", nullable: false),
@@ -178,8 +179,8 @@ namespace TicoBus.DA.Migrations
 
             migrationBuilder.InsertData(
                 table: "Usuarios",
-                columns: new[] { "Id", "Activo", "BloqueadoHasta", "Clave", "Correo", "IntentosFallidos", "Nombre", "Rol" },
-                values: new object[] { 1, true, null, "TicoBus2025*", "ticobus860@gmail.com", 0, "Administrador", 1 });
+                columns: new[] { "Id", "Activo", "BloqueadoHasta", "Clave", "Correo", "IntentosFallidos", "NombreCompleto", "NombreUsuario", "Rol" },
+                values: new object[] { 1, true, null, "TicoBus2025*", "ticobus860@gmail.com", 0, "Administrador", "Administrador", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Choferes_Identificacion",
@@ -220,9 +221,9 @@ namespace TicoBus.DA.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Usuarios_Nombre",
+                name: "IX_Usuarios_NombreUsuario",
                 table: "Usuarios",
-                column: "Nombre",
+                column: "NombreUsuario",
                 unique: true);
 
             migrationBuilder.CreateIndex(

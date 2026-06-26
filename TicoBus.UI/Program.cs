@@ -17,6 +17,10 @@ builder.Services.AddScoped<CorreoService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<ChoferRepository>();
 builder.Services.AddScoped<IChoferService, ChoferService>();
+builder.Services.AddScoped<PasajeroRepository>();
+builder.Services.AddScoped<IPasajeroService, PasajeroService>();
+
+
 
 
 builder.Services.AddSession();

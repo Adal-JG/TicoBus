@@ -232,7 +232,12 @@ namespace TicoBus.DA.Migrations
                     b.Property<int>("IntentosFallidos")
                         .HasColumnType("int");
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("NombreCompleto")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("NombreUsuario")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -242,7 +247,7 @@ namespace TicoBus.DA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Nombre")
+                    b.HasIndex("NombreUsuario")
                         .IsUnique();
 
                     b.ToTable("Usuarios");
@@ -255,7 +260,8 @@ namespace TicoBus.DA.Migrations
                             Clave = "TicoBus2025*",
                             Correo = "ticobus860@gmail.com",
                             IntentosFallidos = 0,
-                            Nombre = "Administrador",
+                            NombreCompleto = "Administrador",
+                            NombreUsuario = "Administrador",
                             Rol = 1
                         });
                 });

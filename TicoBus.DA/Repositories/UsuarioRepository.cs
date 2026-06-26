@@ -13,15 +13,25 @@ namespace TicoBus.DA.Repositories
             _context = context;
         }
 
-        public Usuario? ObtenerPorNombre(string nombre)
+        public Usuario? ObtenerPorNombreUsuario(string nombreUsuario)
         {
             return _context.Usuarios
-                .FirstOrDefault(u => u.Nombre == nombre && u.Activo);
+                .FirstOrDefault(u => u.NombreUsuario == nombreUsuario && u.Activo);
+        }
+
+        public bool ExisteNombreUsuario(string nombreUsuario)
+        {
+            return _context.Usuarios.Any(u => u.NombreUsuario == nombreUsuario);
         }
 
         public void Actualizar(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);
+            _context.SaveChanges();
+        }
+        public void Eliminar(Usuario usuario)
+        {
+            _context.Usuarios.Remove(usuario);
             _context.SaveChanges();
         }
     }

@@ -5,18 +5,18 @@ using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
-    public class ChoferesController : BaseController
+    public class PasajerosController : BaseController
     {
-        private readonly IChoferService _choferService;
+        private readonly IPasajeroService _pasajeroService;
 
-        public ChoferesController(IChoferService choferService)
+        public PasajerosController(IPasajeroService pasajeroService)
         {
-            _choferService = choferService;
+            _pasajeroService = pasajeroService;
         }
 
         public IActionResult Index(string? filtro)
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
@@ -24,28 +24,28 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var choferes = _choferService.Listar(filtro);
+            var pasajeros = _pasajeroService.Listar(filtro);
 
-            return View(choferes);
+            return View(pasajeros);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
                 return validacion;
             }
 
-            return View(new ChoferViewModel());
+            return View(new PasajeroViewModel());
         }
 
         [HttpPost]
-        public IActionResult Create(ChoferViewModel model)
+        public IActionResult Create(PasajeroViewModel model)
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
@@ -57,7 +57,7 @@ namespace TicoBus.UI.Controllers
                 return View(model);
             }
 
-            var chofer = new Chofer
+            var pasajero = new Pasajero
             {
                 Identificacion = model.Identificacion,
                 Nombre = model.Nombre,
@@ -65,7 +65,7 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _choferService.Agregar(chofer, out string mensaje);
+            var resultado = _pasajeroService.Agregar(pasajero, out string mensaje);
 
             if (!resultado)
             {
@@ -80,36 +80,36 @@ namespace TicoBus.UI.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
                 return validacion;
             }
 
-            var chofer = _choferService.ObtenerPorId(id);
+            var pasajero = _pasajeroService.ObtenerPorId(id);
 
-            if (chofer == null)
+            if (pasajero == null)
             {
                 return RedirectToAction("Index");
             }
 
-            var model = new ChoferViewModel
+            var model = new PasajeroViewModel
             {
-                Id = chofer.Id,
-                Identificacion = chofer.Identificacion,
-                Nombre = chofer.Nombre,
-                Apellidos = chofer.Apellidos,
-                Correo = chofer.Correo
+                Id = pasajero.Id,
+                Identificacion = pasajero.Identificacion,
+                Nombre = pasajero.Nombre,
+                Apellidos = pasajero.Apellidos,
+                Correo = pasajero.Correo
             };
 
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(ChoferViewModel model)
+        public IActionResult Edit(PasajeroViewModel model)
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
@@ -121,7 +121,7 @@ namespace TicoBus.UI.Controllers
                 return View(model);
             }
 
-            var chofer = new Chofer
+            var pasajero = new Pasajero
             {
                 Id = model.Id,
                 Identificacion = model.Identificacion,
@@ -130,7 +130,7 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _choferService.Actualizar(chofer, out string mensaje);
+            var resultado = _pasajeroService.Actualizar(pasajero, out string mensaje);
 
             if (!resultado)
             {
@@ -145,14 +145,14 @@ namespace TicoBus.UI.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var validacion = ValidarRol("Administrador");
+            var validacion = ValidarRol("Chofer");
 
             if (validacion != null)
             {
                 return validacion;
             }
 
-            var resultado = _choferService.Eliminar(id, out string mensaje);
+            var resultado = _pasajeroService.Eliminar(id, out string mensaje);
 
             if (resultado)
             {

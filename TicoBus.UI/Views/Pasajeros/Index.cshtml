@@ -1,17 +1,17 @@
-﻿@model List<TicoBus.Model.Chofer>
+﻿@model List<TicoBus.Model.Pasajero>
 
 @{
-    ViewData["Title"] = "Choferes";
+    ViewData["Title"] = "Pasajeros";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2>Gestión de Choferes</h2>
-        <p class="text-muted">Registro y administración de choferes del sistema.</p>
+        <h2>Registro de Pasajeros</h2>
+        <p class="text-muted">Administración de pasajeros registrados por el chofer.</p>
     </div>
 
     <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Nuevo chofer
+        <i class="bi bi-plus-circle"></i> Nuevo pasajero
     </a>
 </div>
 
@@ -55,7 +55,7 @@
         @if (Model.Count == 0)
         {
             <div class="alert alert-info">
-                No hay choferes registrados.
+                No hay pasajeros registrados.
             </div>
         }
         else
@@ -90,7 +90,7 @@
                                     <input type="hidden" name="id" value="@item.Id" />
                                     <button type="submit"
                                             class="btn btn-sm btn-danger"
-                                            onclick="return confirm('¿Seguro que desea eliminar este chofer?');">
+                                            onclick="return confirm('¿Seguro que desea eliminar este pasajero?');">
                                         <i class="bi bi-trash"></i> Eliminar
                                     </button>
                                 </form>

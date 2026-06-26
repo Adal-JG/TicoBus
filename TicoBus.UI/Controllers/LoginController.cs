@@ -28,7 +28,7 @@ namespace TicoBus.UI.Controllers
                 return View(model);
             }
 
-            var usuario = _loginService.Login(model.Nombre, model.Clave, out string mensaje);
+            var usuario = _loginService.Login(model.NombreUsuario, model.Clave, out string mensaje);
 
             if (usuario == null)
             {
@@ -37,7 +37,7 @@ namespace TicoBus.UI.Controllers
             }
 
             HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
-            HttpContext.Session.SetString("Nombre", usuario.Nombre);
+            HttpContext.Session.SetString("Nombre", usuario.NombreCompleto);
             HttpContext.Session.SetString("Rol", usuario.Rol.ToString());
 
             return usuario.Rol switch

@@ -57,6 +57,11 @@ namespace TicoBus.DA.Repositories
             _context.SaveChanges();
         }
 
+        public void Eliminar(Chofer chofer)
+        {
+            _context.Choferes.Remove(chofer);
+            _context.SaveChanges();
+        }
         public bool TieneViajes(int choferId)
         {
             return _context.Viajes.Any(v => v.ChoferId == choferId);
