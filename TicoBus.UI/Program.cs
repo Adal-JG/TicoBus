@@ -12,8 +12,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<UsuarioRepository>();
+builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddScoped<CorreoService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<ChoferRepository>();
+builder.Services.AddScoped<IChoferService, ChoferService>();
+
 
 builder.Services.AddSession();
 

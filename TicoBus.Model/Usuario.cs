@@ -12,7 +12,11 @@ namespace TicoBus.Model
 
         [Required]
         [StringLength(100)]
-        public string Nombre { get; set; } = string.Empty;
+        public string NombreUsuario { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(150)]
+        public string NombreCompleto { get; set; } = string.Empty;
 
         [Required]
         [StringLength(200)]

@@ -1,0 +1,89 @@
+﻿@model List<TicoBus.Model.Chofer>
+
+@{
+    ViewData["Title"] = "Choferes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Gestión de Choferes</h2>
+        <p class="text-muted">Registro y administración de choferes del sistema.</p>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nuevo chofer
+    </a>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success shadow-sm">
+        @TempData["Exito"]
+    </div>
+}
+
+<form method="get" class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-10">
+                <input type="text"
+                       name="filtro"
+                       value="@ViewBag.Filtro"
+                       class="form-control"
+                       placeholder="Buscar por nombre o apellidos..." />
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-dark w-100" type="submit">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+        @if (Model.Count == 0)
+        {
+            <div class="alert alert-info">
+                No hay choferes registrados.
+            </div>
+        }
+        else
+        {
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Identificación</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Usuario</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Identificacion</td>
+                            <td>@item.Nombre</td>
+                            <td>@item.Apellidos</td>
+                            <td>@item.Correo</td>
+                            <td>@item.Usuario?.Nombre</td>
+                            <td class="text-end">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+    </div>
+</div>

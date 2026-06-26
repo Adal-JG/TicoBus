@@ -61,7 +61,7 @@ namespace TicoBus.DA.Data
                 .IsUnique();
 
             modelBuilder.Entity<Usuario>()
-                .HasIndex(u => u.Nombre)
+                .HasIndex(u => u.NombreUsuario)
                 .IsUnique();
 
             modelBuilder.Entity<Chofer>()
@@ -76,7 +76,8 @@ namespace TicoBus.DA.Data
                 new Usuario
                 {
                     Id = 1,
-                    Nombre = "Administrador",
+                    NombreUsuario = "Administrador",
+                    NombreCompleto = "Administrador",
                     Clave = "TicoBus2025*",
                     Correo = "ticobus860@gmail.com",
                     Rol = RolUsuario.Administrador,

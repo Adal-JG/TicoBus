@@ -2,20 +2,84 @@
     ViewData["Title"] = "Panel principal";
 }
 
-<div class="container mt-4">
+<div class="mb-4">
+    <h2>Bienvenido, @ViewBag.Nombre</h2>
+    <p class="text-muted">Resumen general del sistema TicoBus.</p>
+</div>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h2>Bienvenido, @ViewBag.Nombre</h2>
-            <p class="text-muted">Rol actual: @ViewBag.Rol</p>
+<div class="row g-4">
 
-            <hr />
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Choferes</h6>
+                <h2>@ViewBag.TotalChoferes</h2>
+                <i class="bi bi-person-badge fs-1 text-primary"></i>
+            </div>
+        </div>
+    </div>
 
-            <p>Has iniciado sesión correctamente en TicoBus.</p>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Pasajeros</h6>
+                <h2>@ViewBag.TotalPasajeros</h2>
+                <i class="bi bi-people fs-1 text-success"></i>
+            </div>
+        </div>
+    </div>
 
-            <a asp-controller="Login" asp-action="Logout" class="btn btn-danger">
-                Cerrar sesión
-            </a>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Rutas</h6>
+                <h2>@ViewBag.TotalRutas</h2>
+                <i class="bi bi-signpost-2 fs-1 text-warning"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Unidades</h6>
+                <h2>@ViewBag.TotalUnidades</h2>
+                <i class="bi bi-bus-front fs-1 text-danger"></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4 mt-2">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Viajes programados</h6>
+                <h2>@ViewBag.TotalViajesProgramados</h2>
+                <i class="bi bi-calendar-check fs-1 text-primary"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Viajes en curso</h6>
+                <h2>@ViewBag.TotalViajesEnCurso</h2>
+                <i class="bi bi-play-circle fs-1 text-success"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="text-muted">Viajes cancelados</h6>
+                <h2>@ViewBag.TotalViajesCancelados</h2>
+                <i class="bi bi-x-octagon fs-1 text-danger"></i>
+            </div>
         </div>
     </div>
 
