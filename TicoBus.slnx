@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="TicoBus.BL/TicoBus.BL.csproj" />
+  <Project Path="TicoBus.DA/TicoBus.DA.csproj" />
+  <Project Path="TicoBus.Model/TicoBus.Model.csproj" />
+  <Project Path="TicoBus.SI/TicoBus.SI.csproj" />
+  <Project Path="TicoBus.UI/TicoBus.UI.csproj" />
+</Solution>
