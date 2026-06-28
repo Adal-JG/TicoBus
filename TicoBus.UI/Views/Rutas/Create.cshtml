@@ -1,0 +1,63 @@
+﻿@model TicoBus.UI.Models.RutaViewModel
+
+@{
+    ViewData["Title"] = "Nueva ruta";
+}
+
+<div class="mb-4">
+    <h2>Nueva Ruta</h2>
+    <p class="text-muted">Complete los datos para registrar una ruta.</p>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+        <form asp-action="Create" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Origen" class="form-label">Origen</label>
+                <input asp-for="Origen" class="form-control" />
+                <span asp-validation-for="Origen" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Destino" class="form-label">Destino</label>
+                <input asp-for="Destino" class="form-control" />
+                <span asp-validation-for="Destino" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DuracionEstimada" class="form-label">Duración estimada</label>
+                <input asp-for="DuracionEstimada" class="form-control" placeholder="Ejemplo: 02:30" />
+                <span asp-validation-for="DuracionEstimada" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PrecioBase" class="form-label">Precio base por pasajero</label>
+                <input asp-for="PrecioBase" class="form-control" />
+                <span asp-validation-for="PrecioBase" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">Volver</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
