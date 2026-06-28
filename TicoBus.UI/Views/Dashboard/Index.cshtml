@@ -2,49 +2,71 @@
     ViewData["Title"] = "Panel principal";
 }
 
-<div class="mb-4">
-    <h2>Bienvenido, @ViewBag.Nombre</h2>
-    <p class="text-muted">Resumen general del sistema TicoBus.</p>
+<div class="page-header">
+    <div>
+        <h2>Panel principal</h2>
+        <p>Resumen general del sistema TicoBus.</p>
+    </div>
 </div>
 
 <div class="row g-4">
 
     <div class="col-md-3">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-primary">
             <div class="card-body">
-                <h6 class="text-muted">Choferes</h6>
-                <h2>@ViewBag.TotalChoferes</h2>
-                <i class="bi bi-person-badge fs-1 text-primary"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Choferes</div>
+                        <div class="stat-number">@ViewBag.TotalChoferes</div>
+                    </div>
+                    <i class="bi bi-person-badge stat-icon"></i>
+                </div>
+                <a asp-controller="Choferes" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-green">
             <div class="card-body">
-                <h6 class="text-muted">Pasajeros</h6>
-                <h2>@ViewBag.TotalPasajeros</h2>
-                <i class="bi bi-people fs-1 text-success"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Pasajeros</div>
+                        <div class="stat-number">@ViewBag.TotalPasajeros</div>
+                    </div>
+                    <i class="bi bi-people stat-icon"></i>
+                </div>
+                <a asp-controller="Pasajeros" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-warning">
             <div class="card-body">
-                <h6 class="text-muted">Rutas</h6>
-                <h2>@ViewBag.TotalRutas</h2>
-                <i class="bi bi-signpost-2 fs-1 text-warning"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Rutas</div>
+                        <div class="stat-number">@ViewBag.TotalRutas</div>
+                    </div>
+                    <i class="bi bi-signpost-2 stat-icon"></i>
+                </div>
+                <a asp-controller="Rutas" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-danger">
             <div class="card-body">
-                <h6 class="text-muted">Unidades</h6>
-                <h2>@ViewBag.TotalUnidades</h2>
-                <i class="bi bi-bus-front fs-1 text-danger"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Unidades</div>
+                        <div class="stat-number">@ViewBag.TotalUnidades</div>
+                    </div>
+                    <i class="bi bi-bus-front stat-icon"></i>
+                </div>
+                <a asp-controller="Unidades" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
@@ -54,31 +76,46 @@
 <div class="row g-4 mt-2">
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-blue">
             <div class="card-body">
-                <h6 class="text-muted">Viajes programados</h6>
-                <h2>@ViewBag.TotalViajesProgramados</h2>
-                <i class="bi bi-calendar-check fs-1 text-primary"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Viajes programados</div>
+                        <div class="stat-number">@ViewBag.TotalViajesProgramados</div>
+                    </div>
+                    <i class="bi bi-calendar-check stat-icon"></i>
+                </div>
+                <a asp-controller="Viajes" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-green">
             <div class="card-body">
-                <h6 class="text-muted">Viajes en curso</h6>
-                <h2>@ViewBag.TotalViajesEnCurso</h2>
-                <i class="bi bi-play-circle fs-1 text-success"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Viajes en curso</div>
+                        <div class="stat-number">@ViewBag.TotalViajesEnCurso</div>
+                    </div>
+                    <i class="bi bi-play-circle stat-icon"></i>
+                </div>
+                <a asp-controller="ViajesEnCurso" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-0">
+        <div class="card stat-card bg-tb-purple">
             <div class="card-body">
-                <h6 class="text-muted">Viajes cancelados</h6>
-                <h2>@ViewBag.TotalViajesCancelados</h2>
-                <i class="bi bi-x-octagon fs-1 text-danger"></i>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Viajes cancelados</div>
+                        <div class="stat-number">@ViewBag.TotalViajesCancelados</div>
+                    </div>
+                    <i class="bi bi-x-octagon stat-icon"></i>
+                </div>
+                <a asp-controller="ViajesCancelados" asp-action="Index" class="stat-link">Ver listado</a>
             </div>
         </div>
     </div>

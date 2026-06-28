@@ -1,0 +1,216 @@
+﻿:root {
+    --tb-primary: #102a43;
+    --tb-secondary: #243b53;
+    --tb-accent: #486581;
+    --tb-bg: #f4f6f9;
+    --tb-border: #e5e7eb;
+}
+
+body {
+    background-color: var(--tb-bg);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+    margin-top: 0;
+}
+
+    .page-header h2 {
+        margin: 0;
+        font-weight: 700;
+        color: #102a43;
+    }
+
+    .page-header p {
+        margin: 4px 0 0;
+        color: #6c757d;
+    }
+
+.app-card {
+    background: #ffffff;
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+}
+
+    .app-card .card-body {
+        padding: 22px;
+    }
+
+.app-table {
+    margin-bottom: 0;
+}
+
+    .app-table thead th {
+        background-color: var(--tb-primary);
+        color: #ffffff;
+        font-weight: 600;
+        border: none;
+        padding: 14px;
+    }
+
+    .app-table tbody td {
+        padding: 13px 14px;
+        vertical-align: middle;
+    }
+
+    .app-table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+.filter-card {
+    background: #ffffff;
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+    margin-bottom: 28px;
+    padding: 20px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #334e68;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--tb-accent);
+        box-shadow: 0 0 0 .2rem rgba(72,101,129,.15);
+    }
+
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--tb-primary);
+    border-color: var(--tb-primary);
+}
+
+    .btn-primary:hover {
+        background-color: var(--tb-secondary);
+        border-color: var(--tb-secondary);
+    }
+
+.action-buttons {
+    display: flex;
+    justify-content: end;
+    gap: 6px;
+}
+
+.alert {
+    border-radius: 12px;
+    border: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,.04);
+}
+
+.stat-card {
+    border: 0;
+    border-radius: 18px;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+    .stat-card .card-body {
+        padding: 24px;
+    }
+
+.stat-icon {
+    font-size: 34px;
+    opacity: .9;
+}
+
+.stat-number {
+    font-size: 34px;
+    font-weight: 700;
+    margin: 10px 0 0;
+}
+
+.stat-label {
+    font-size: 15px;
+    opacity: .95;
+}
+
+.stat-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: .9;
+}
+
+    .stat-link:hover {
+        color: #ffffff;
+        opacity: 1;
+        text-decoration: underline;
+    }
+
+.bg-tb-primary {
+    background-color: #102a43;
+}
+
+.bg-tb-blue {
+    background-color: #486581;
+}
+
+.bg-tb-green {
+    background-color: #198754;
+}
+
+.bg-tb-warning {
+    background-color: #f0ad4e;
+}
+
+.bg-tb-danger {
+    background-color: #dc3545;
+}
+
+.bg-tb-purple {
+    background-color: #6f42c1;
+}
+.content {
+    padding-top: 25px !important;
+}
+
+main {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.filter-card {
+    margin-top: 0 !important;
+}
+
+.app-card {
+    margin-top: 0 !important;
+}
+.table-wrapper {
+    padding: 28px;
+}
+
+.app-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.app-table thead th {
+    background-color: var(--tb-primary);
+    color: #ffffff;
+    font-weight: 600;
+    border: none;
+    padding: 16px 18px;
+}
+
+.app-table tbody td {
+    padding: 16px 18px;
+    vertical-align: middle;
+}

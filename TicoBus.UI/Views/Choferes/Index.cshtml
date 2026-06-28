@@ -4,10 +4,10 @@
     ViewData["Title"] = "Choferes";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header">
     <div>
         <h2>Gestión de Choferes</h2>
-        <p class="text-muted">Registro y administración de choferes del sistema.</p>
+        <p class="text-muted mb-0">Registro y administración de choferes del sistema.</p>
     </div>
 
     <a asp-action="Create" class="btn btn-primary">
@@ -29,28 +29,26 @@
     </div>
 }
 
-<form method="get" class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <div class="row g-2">
-            <div class="col-md-10">
-                <input type="text"
-                       name="filtro"
-                       value="@ViewBag.Filtro"
-                       class="form-control"
-                       placeholder="Buscar por nombre o apellidos..." />
-            </div>
+<form method="get" class="filter-card">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-10">
+            <input type="text"
+                   name="filtro"
+                   value="@ViewBag.Filtro"
+                   class="form-control"
+                   placeholder="Buscar por nombre o apellidos..." />
+        </div>
 
-            <div class="col-md-2">
-                <button class="btn btn-dark w-100" type="submit">
-                    <i class="bi bi-search"></i> Buscar
-                </button>
-            </div>
+        <div class="col-md-2">
+            <button class="btn btn-dark w-100" type="submit">
+                <i class="bi bi-search"></i> Buscar
+            </button>
         </div>
     </div>
 </form>
 
-<div class="card border-0 shadow-sm">
-    <div class="card-body">
+<div class="card app-card">
+    <div class="card-body table-wrapper">
 
         @if (Model.Count == 0)
         {
@@ -60,7 +58,7 @@
         }
         else
         {
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle app-table">
                 <thead>
                     <tr>
                         <th>Identificación</th>
@@ -81,19 +79,21 @@
                             <td>@item.Apellidos</td>
                             <td>@item.Correo</td>
                             <td>@item.Usuario?.NombreUsuario</td>
-                            <td class="text-end">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </a>
+                            <td>
+                                <div class="action-buttons">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
 
-                                <form asp-action="Delete" method="post" class="d-inline">
-                                    <input type="hidden" name="id" value="@item.Id" />
-                                    <button type="submit"
-                                            class="btn btn-sm btn-danger"
-                                            onclick="return confirm('¿Seguro que desea eliminar este chofer?');">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                </form>
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('¿Seguro que desea eliminar este chofer?');">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     }
