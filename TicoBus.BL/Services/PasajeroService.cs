@@ -25,6 +25,10 @@ namespace TicoBus.BL.Services
         {
             return _pasajeroRepository.Listar(filtro);
         }
+        public Pasajero? ObtenerPorUsuarioId(int usuarioId)
+        {
+            return _pasajeroRepository.ObtenerPorUsuarioId(usuarioId);
+        }
 
         public Pasajero? ObtenerPorId(int id)
         {

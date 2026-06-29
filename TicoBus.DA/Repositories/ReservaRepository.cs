@@ -21,7 +21,19 @@ namespace TicoBus.DA.Repositories
                 .OrderBy(r => r.NumeroAsiento)
                 .ToList();
         }
-
+        public List<Reserva> ListarPorPasajero(int pasajeroId)
+        {
+            return _context.Reservas
+                .Include(r => r.Viaje)
+                    .ThenInclude(v => v.Ruta)
+                .Include(r => r.Viaje)
+                    .ThenInclude(v => v.Unidad)
+                .Include(r => r.Viaje)
+                    .ThenInclude(v => v.Chofer)
+                .Where(r => r.PasajeroId == pasajeroId && r.Activa)
+                .OrderByDescending(r => r.Viaje!.FechaHoraSalida)
+                .ToList();
+        }
         public bool AsientoOcupado(int viajeId, int numeroAsiento)
         {
             return _context.Reservas.Any(r =>

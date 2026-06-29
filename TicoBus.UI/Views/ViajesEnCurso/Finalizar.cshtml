@@ -1,0 +1,251 @@
+﻿@model TicoBus.Model.Viaje
+@using TicoBus.Model
+
+@{
+    ViewData["Title"] = "Finalizar viaje";
+
+    var reservas = ViewBag.Reservas as List<Reserva> ?? new List<Reserva>();
+
+    int ocupados = ViewBag.Ocupados ?? 0;
+    decimal total = ViewBag.Total ?? 0;
+}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>Finalizar Viaje</h2>
+
+        <p class="text-muted mb-0">
+            Revise el resumen antes de confirmar el cierre del viaje.
+        </p>
+
+    </div>
+
+    <a asp-action="Index"
+           class="btn btn-secondary">
+
+        <i class="bi bi-arrow-left"></i>
+
+        Volver
+
+    </a>
+
+</div>
+
+<div class="alert alert-warning shadow-sm">
+
+    <i class="bi bi-exclamation-triangle"></i>
+
+    Verifique la información antes de finalizar el viaje.
+
+</div>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+
+        <div class="card stat-card bg-tb-primary">
+
+            <div class="card-body">
+
+                <div class="stat-label">
+
+                    Pasajeros
+
+                </div>
+
+                <div class="stat-number">
+
+                    @ocupados
+
+                </div>
+
+                <i class="bi bi-people stat-icon"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card stat-card bg-tb-green">
+
+            <div class="card-body">
+
+                <div class="stat-label">
+
+                    Recaudación
+
+                </div>
+
+                <div class="stat-number">
+
+                    ₡@total.ToString("N2")
+
+                </div>
+
+                <i class="bi bi-cash-coin stat-icon"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card app-card mb-4">
+
+    <div class="card-body">
+
+        <h5 class="mb-3">
+
+            Información del viaje
+
+        </h5>
+
+        <hr />
+
+        <p>
+
+            <strong>Ruta:</strong>
+
+            @Model.Ruta?.Origen → @Model.Ruta?.Destino
+
+        </p>
+
+        <p>
+
+            <strong>Unidad:</strong>
+
+            @Model.Unidad?.Placa
+
+        </p>
+
+        <p>
+
+            <strong>Chofer:</strong>
+
+            @Model.Chofer?.Nombre @Model.Chofer?.Apellidos
+
+        </p>
+
+        <p>
+
+            <strong>Salida:</strong>
+
+            @Model.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")
+
+        </p>
+
+        <p>
+
+            <strong>Llegada estimada:</strong>
+
+            @Model.FechaHoraLlegadaEstimada.ToString("dd/MM/yyyy HH:mm")
+
+        </p>
+
+    </div>
+
+</div>
+
+<div class="card app-card mb-4">
+
+    <div class="card-body table-wrapper">
+
+        @if (!reservas.Any())
+        {
+            <div class="alert alert-info">
+
+                Este viaje no tiene pasajeros registrados.
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-hover app-table w-100">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Pasajero</th>
+
+                            <th>Identificación</th>
+
+                            <th>Asiento</th>
+
+                            <th>Monto</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in reservas)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    @item.Pasajero?.Nombre @item.Pasajero?.Apellidos
+
+                                </td>
+
+                                <td>
+
+                                    @item.Pasajero?.Identificacion
+
+                                </td>
+
+                                <td>
+
+                                    @item.NumeroAsiento
+
+                                </td>
+
+                                <td>
+
+                                    ₡@item.MontoPagado.ToString("N2")
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<form asp-action="ConfirmarFinalizar"
+      method="post">
+
+    <input type="hidden"
+           name="id"
+           value="@Model.Id" />
+
+    <button type="submit"
+            class="btn btn-success"
+            onclick="return confirm('¿Está seguro de finalizar este viaje?');">
+
+        <i class="bi bi-check-circle"></i>
+
+        Confirmar finalización
+
+    </button>
+
+</form>

@@ -38,6 +38,12 @@ namespace TicoBus.DA.Repositories
                 .Include(p => p.Usuario)
                 .FirstOrDefault(p => p.Id == id);
         }
+        public Pasajero? ObtenerPorUsuarioId(int usuarioId)
+        {
+            return _context.Pasajeros
+                .Include(p => p.Usuario)
+                .FirstOrDefault(p => p.UsuarioId == usuarioId);
+        }
 
         public bool ExisteIdentificacion(string identificacion, int idExcluir = 0)
         {

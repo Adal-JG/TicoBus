@@ -1,0 +1,41 @@
+﻿@model TicoBus.Model.Viaje
+
+@{
+    ViewData["Title"] = "Detalle viaje cancelado";
+}
+
+<div class="page-header">
+    <div>
+        <h2>Detalle del Viaje Cancelado</h2>
+        <p class="text-muted mb-0">Información completa del viaje y motivo de cancelación.</p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card app-card mb-4">
+    <div class="card-body">
+        <h5>Información del viaje</h5>
+        <hr />
+
+        <p><strong>Número de viaje:</strong> #@Model.Id</p>
+        <p><strong>Ruta:</strong> @Model.Ruta?.Origen → @Model.Ruta?.Destino</p>
+        <p><strong>Unidad:</strong> @Model.Unidad?.Placa</p>
+        <p><strong>Chofer:</strong> @Model.Chofer?.Nombre @Model.Chofer?.Apellidos</p>
+        <p><strong>Salida:</strong> @Model.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Llegada estimada:</strong> @Model.FechaHoraLlegadaEstimada.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</div>
+
+<div class="card app-card">
+    <div class="card-body">
+        <h5>Motivo de cancelación</h5>
+        <hr />
+
+        <div class="alert alert-danger mb-0">
+            @Model.MotivoCancelacion
+        </div>
+    </div>
+</div>

@@ -39,7 +39,10 @@ namespace TicoBus.BL.Services
         {
             _viajeRepository = viajeRepository;
         }
-
+        public List<Viaje> ListarCancelados()
+        {
+            return _viajeRepository.ListarCancelados();
+        }
         public List<Viaje> Listar(string? filtro)
         {
             return _viajeRepository.Listar(filtro);

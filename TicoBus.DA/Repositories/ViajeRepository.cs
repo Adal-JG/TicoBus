@@ -34,6 +34,17 @@ namespace TicoBus.DA.Repositories
                 .ToList();
         }
 
+        public List<Viaje> ListarCancelados()
+        {
+            return _context.Viajes
+                .Include(v => v.Ruta)
+                .Include(v => v.Unidad)
+                .Include(v => v.Chofer)
+                .Where(v => v.Estado == EstadoViaje.Cancelado)
+                .OrderByDescending(v => v.FechaHoraSalida)
+                .ToList();
+        }
+
         public Viaje? ObtenerPorId(int id)
         {
             return _context.Viajes

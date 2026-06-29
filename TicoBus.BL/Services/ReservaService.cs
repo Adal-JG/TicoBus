@@ -16,7 +16,10 @@ namespace TicoBus.BL.Services
             _reservaRepository = reservaRepository;
             _viajeRepository = viajeRepository;
         }
-
+        public List<Reserva> ListarPorPasajero(int pasajeroId)
+        {
+            return _reservaRepository.ListarPorPasajero(pasajeroId);
+        }
         public List<Reserva> ListarPorViaje(int viajeId)
         {
             return _reservaRepository.ListarPorViaje(viajeId);

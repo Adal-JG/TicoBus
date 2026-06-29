@@ -1,0 +1,118 @@
+﻿@model TicoBus.Model.Reserva
+
+@{
+    ViewData["Title"] = "Detalle del viaje";
+}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>Detalle del Viaje</h2>
+
+        <p class="text-muted mb-0">
+            Información de la reserva realizada.
+        </p>
+
+    </div>
+
+    <a asp-action="Index"
+           class="btn btn-secondary">
+
+        <i class="bi bi-arrow-left"></i>
+
+        Volver
+
+    </a>
+
+</div>
+
+<div class="card app-card">
+
+    <div class="card-body">
+
+        <h5 class="mb-4">
+
+            Información del viaje
+
+        </h5>
+
+        <hr />
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <p>
+
+                    <strong>Ruta</strong>
+
+                    <br />
+
+                    @Model.Viaje?.Ruta?.Origen →
+                    @Model.Viaje?.Ruta?.Destino
+
+                </p>
+
+                <p>
+
+                    <strong>Unidad</strong>
+
+                    <br />
+
+                    @Model.Viaje?.Unidad?.Placa
+
+                </p>
+
+                <p>
+
+                    <strong>Chofer</strong>
+
+                    <br />
+
+                    @Model.Viaje?.Chofer?.Nombre
+                    @Model.Viaje?.Chofer?.Apellidos
+
+                </p>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <p>
+
+                    <strong>Fecha de salida</strong>
+
+                    <br />
+
+                    @Model.Viaje?.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")
+
+                </p>
+
+                <p>
+
+                    <strong>Asiento</strong>
+
+                    <br />
+
+                    @Model.NumeroAsiento
+
+                </p>
+
+                <p>
+
+                    <strong>Total pagado</strong>
+
+                    <br />
+
+                    ₡@Model.MontoPagado.ToString("N2")
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

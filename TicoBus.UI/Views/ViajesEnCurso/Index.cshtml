@@ -7,24 +7,30 @@
 <div class="page-header">
     <div>
         <h2>Viajes en Curso</h2>
-        <p class="text-muted mb-0">Gestión de viajes activos, reservas y recaudación.</p>
+        <p class="text-muted mb-0">
+            Gestión de viajes activos, reservas y recaudación.
+        </p>
     </div>
 </div>
 
 @if (TempData["Exito"] != null)
 {
-    <div class="alert alert-success shadow-sm">@TempData["Exito"]</div>
+    <div class="alert alert-success shadow-sm">
+        @TempData["Exito"]
+    </div>
 }
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+    <div class="alert alert-danger shadow-sm">
+        @TempData["Error"]
+    </div>
 }
 
 <div class="card app-card">
     <div class="card-body table-wrapper">
 
-        @if (Model.Count == 0)
+        @if (!Model.Any())
         {
             <div class="alert alert-info">
                 No hay viajes en curso.
@@ -33,7 +39,9 @@
         else
         {
             <div class="table-responsive">
+
                 <table class="table table-hover align-middle app-table w-100">
+
                     <thead>
                         <tr>
                             <th>Número</th>
@@ -47,38 +55,69 @@
                     </thead>
 
                     <tbody>
+
                         @foreach (var item in Model)
                         {
                             var ocupados = item.Reservas?.Count(r => r.Activa) ?? 0;
                             var capacidad = item.Unidad?.CapacidadPasajeros ?? 0;
 
                             <tr>
+
                                 <td>#@item.Id</td>
-                                <td>@item.Ruta?.Origen → @item.Ruta?.Destino</td>
-                                <td>@item.Unidad?.Placa</td>
-                                <td>@item.Chofer?.Nombre @item.Chofer?.Apellidos</td>
-                                <td>@item.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td>@ocupados / @capacidad</td>
+
+                                <td>
+                                    @item.Ruta?.Origen → @item.Ruta?.Destino
+                                </td>
+
+                                <td>
+                                    @item.Unidad?.Placa
+                                </td>
+
+                                <td>
+                                    @item.Chofer?.Nombre @item.Chofer?.Apellidos
+                                </td>
+
+                                <td>
+                                    @item.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+
+                                <td>
+                                    @ocupados / @capacidad
+                                </td>
+
                                 <td class="text-end">
+
                                     <div class="action-buttons">
-                                        <a asp-action="Administrar" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-gear"></i> Administrar
+
+                                        <a asp-action="Administrar"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-gear"></i>
+                                            Administrar
+
                                         </a>
 
-                                        <form asp-action="Finalizar" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-success"
-                                                    onclick="return confirm('¿Desea finalizar este viaje?');">
-                                                <i class="bi bi-check-circle"></i> Finalizar
-                                            </button>
-                                        </form>
+                                        <a asp-action="Finalizar"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-success">
+
+                                            <i class="bi bi-check-circle"></i>
+                                            Finalizar
+
+                                        </a>
+
                                     </div>
+
                                 </td>
+
                             </tr>
                         }
+
                     </tbody>
+
                 </table>
+
             </div>
         }
 

@@ -37,7 +37,6 @@ namespace TicoBus.UI.Controllers
 
         public IActionResult Administrar(int id)
         {
-
             var validacion = ValidarRol("Administrador", "Chofer");
 
             if (validacion != null)
@@ -57,6 +56,7 @@ namespace TicoBus.UI.Controllers
 
             ViewBag.Reservas = reservas;
             ViewBag.AsientosOcupados = reservas.Select(r => r.NumeroAsiento).ToList();
+
             ViewBag.Pasajeros = new SelectList(
                 _pasajeroService.Listar(null).Select(p => new
                 {
@@ -70,19 +70,6 @@ namespace TicoBus.UI.Controllers
             ViewBag.Total = _reservaService.TotalRecaudado(id);
             ViewBag.Capacidad = viaje.Unidad?.CapacidadPasajeros ?? 0;
 
-            ViewBag.Reservas = _reservaService.ListarPorViaje(id);
-            ViewBag.Pasajeros = new SelectList(
-                _pasajeroService.Listar(null).Select(p => new
-                {
-                    p.Id,
-                    NombreCompleto = $"{p.Nombre} {p.Apellidos} - {p.Identificacion}"
-                }),
-                "Id",
-                "NombreCompleto");
-
-            ViewBag.Ocupados = _reservaService.CantidadReservasActivas(id);
-            ViewBag.Total = _reservaService.TotalRecaudado(id);
-            ViewBag.Capacidad = viaje.Unidad?.CapacidadPasajeros ?? 0;
             return View(new ReservaViewModel
             {
                 ViajeId = id
@@ -126,8 +113,25 @@ namespace TicoBus.UI.Controllers
             return RedirectToAction("Administrar", new { id = viajeId });
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult Finalizar(int id)
+        {
+            var viaje = _viajeService.ObtenerPorId(id);
+
+            if (viaje == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Reservas = _reservaService.ListarPorViaje(id);
+            ViewBag.Ocupados = _reservaService.CantidadReservasActivas(id);
+            ViewBag.Total = _reservaService.TotalRecaudado(id);
+
+            return View("Finalizar", viaje);
+        }
+
+        [HttpPost]
+        public IActionResult ConfirmarFinalizar(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 

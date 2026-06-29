@@ -9,5 +9,6 @@ namespace TicoBus.BL.Interfaces
         bool Agregar(Pasajero pasajero, out string mensaje);
         bool Actualizar(Pasajero pasajero, out string mensaje);
         bool Eliminar(int id, out string mensaje);
+        Pasajero? ObtenerPorUsuarioId(int usuarioId);
     }
 }

@@ -6,6 +6,7 @@ namespace TicoBus.BL.Interfaces
     {
         List<Viaje> ListarEnCurso();
         List<Viaje> Listar(string? filtro);
+        List<Viaje> ListarCancelados();
         Viaje? ObtenerPorId(int id);
         bool Agregar(Viaje viaje, out string mensaje);
         bool Actualizar(Viaje viaje, out string mensaje);

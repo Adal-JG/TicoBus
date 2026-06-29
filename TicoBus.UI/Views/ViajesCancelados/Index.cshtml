@@ -1,0 +1,65 @@
+﻿@model List<TicoBus.Model.Viaje>
+
+@{
+    ViewData["Title"] = "Viajes cancelados";
+}
+
+<div class="page-header">
+    <div>
+        <h2>Viajes Cancelados</h2>
+        <p class="text-muted mb-0">Listado de viajes cancelados y sus motivos.</p>
+    </div>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+}
+
+<div class="card app-card">
+    <div class="card-body table-wrapper">
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                No hay viajes cancelados.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle app-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Ruta</th>
+                            <th>Unidad</th>
+                            <th>Chofer</th>
+                            <th>Salida</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>#@item.Id</td>
+                                <td>@item.Ruta?.Origen → @item.Ruta?.Destino</td>
+                                <td>@item.Unidad?.Placa</td>
+                                <td>@item.Chofer?.Nombre @item.Chofer?.Apellidos</td>
+                                <td>@item.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-end">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Detalle
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </div>
+</div>
