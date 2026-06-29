@@ -1,0 +1,52 @@
+﻿@model TicoBus.UI.Models.ViajeViewModel
+
+@{
+    ViewData["Title"] = "Cancelar viaje";
+}
+
+<div class="page-header">
+    <div>
+        <h2>Cancelar Viaje</h2>
+        <p class="text-muted mb-0">Indique el motivo de cancelación del viaje.</p>
+    </div>
+</div>
+
+<div class="card app-card">
+    <div class="card-body">
+
+        <form asp-action="Cancelar" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="alert alert-warning">
+                Está a punto de cancelar el viaje seleccionado. Esta acción no podrá revertirse.
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="MotivoCancelacion" class="form-label">Motivo de cancelación</label>
+                <textarea asp-for="MotivoCancelacion"
+                          class="form-control"
+                          rows="5"
+                          placeholder="Ingrese el motivo de cancelación..."></textarea>
+                <span asp-validation-for="MotivoCancelacion" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-x-circle"></i> Confirmar cancelación
+                </button>
+
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

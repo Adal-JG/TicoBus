@@ -76,5 +76,23 @@ namespace TicoBus.DA.Repositories
             _context.Viajes.Update(viaje);
             _context.SaveChanges();
         }
+        public List<Viaje> ListarEnCurso()
+        {
+            return _context.Viajes
+                .Include(v => v.Ruta)
+                .Include(v => v.Unidad)
+                .Include(v => v.Chofer)
+                .Include(v => v.Reservas)
+                .Where(v => v.Estado == EstadoViaje.EnCurso)
+                .OrderByDescending(v => v.FechaHoraSalida)
+                .ToList();
+        }
+
+        public void Finalizar(Viaje viaje)
+        {
+            viaje.Estado = EstadoViaje.Completado;
+            _context.Viajes.Update(viaje);
+            _context.SaveChanges();
+        }
     }
 }

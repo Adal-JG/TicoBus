@@ -23,6 +23,10 @@ builder.Services.AddScoped<RutaRepository>();
 builder.Services.AddScoped<IRutaService, RutaService>();
 builder.Services.AddScoped<UnidadRepository>();
 builder.Services.AddScoped<IUnidadService, UnidadService>();
+builder.Services.AddScoped<ViajeRepository>();
+builder.Services.AddScoped<IViajeService, ViajeService>();
+
+
 
 
 builder.Services.AddSession();
