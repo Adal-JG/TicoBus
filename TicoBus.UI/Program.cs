@@ -21,7 +21,8 @@ builder.Services.AddScoped<PasajeroRepository>();
 builder.Services.AddScoped<IPasajeroService, PasajeroService>();
 builder.Services.AddScoped<RutaRepository>();
 builder.Services.AddScoped<IRutaService, RutaService>();
-
+builder.Services.AddScoped<UnidadRepository>();
+builder.Services.AddScoped<IUnidadService, UnidadService>();
 
 
 builder.Services.AddSession();
