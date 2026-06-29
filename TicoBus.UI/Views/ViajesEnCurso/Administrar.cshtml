@@ -1,0 +1,213 @@
+﻿@model TicoBus.UI.Models.ReservaViewModel
+@using TicoBus.Model
+
+@{
+    ViewData["Title"] = "Administrar viaje";
+
+    var reservas = ViewBag.Reservas as List<Reserva> ?? new List<Reserva>();
+    var asientosOcupados = ViewBag.AsientosOcupados as List<int> ?? new List<int>();
+
+    int ocupados = ViewBag.Ocupados ?? 0;
+    decimal total = ViewBag.Total ?? 0;
+    int capacidad = ViewBag.Capacidad ?? 0;
+}
+
+<div class="page-header">
+    <div>
+        <h2>Administrar Viaje</h2>
+        <p class="text-muted mb-0">Reservas, pasajeros embarcados y recaudación.</p>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success shadow-sm">@TempData["Exito"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger shadow-sm">@TempData["Error"]</div>
+}
+
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+        <div class="card stat-card bg-tb-primary">
+            <div class="card-body">
+                <div class="stat-label">Pasajeros embarcados</div>
+                <div class="stat-number">@ocupados</div>
+                <i class="bi bi-people stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card stat-card bg-tb-green">
+            <div class="card-body">
+                <div class="stat-label">Total recaudado</div>
+                <div class="stat-number">₡@total.ToString("N2")</div>
+                <i class="bi bi-cash-coin stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card app-card mb-4">
+    <div class="card-body">
+
+        <h5 class="mb-3">Reservar asiento</h5>
+
+        <form asp-action="Reservar" method="post">
+
+            <input type="hidden" asp-for="ViajeId" />
+            <input type="hidden" asp-for="NumeroAsiento" id="NumeroAsiento" />
+
+            <div class="mb-4">
+                <label asp-for="PasajeroId" class="form-label">Pasajero</label>
+                <select asp-for="PasajeroId" asp-items="ViewBag.Pasajeros" class="form-select">
+                    <option value="">Seleccione un pasajero</option>
+                </select>
+                <span asp-validation-for="PasajeroId" class="text-danger"></span>
+            </div>
+
+            <div class="bus-layout mb-4">
+
+                <div class="bus-header">
+                    <div class="driver-box">
+                        <i class="bi bi-steering-wheel"></i>
+                        <span>Conductor</span>
+                    </div>
+                </div>
+
+                <div class="seat-map">
+
+                    @for (int asiento = 1; asiento <= capacidad; asiento++)
+                    {
+                        var ocupado = asientosOcupados.Contains(asiento);
+                        var clase = ocupado ? "seat occupied" : "seat available";
+
+                        <button type="button"
+                                class="@clase"
+                                data-seat="@asiento"
+                            @(ocupado ? "disabled" : "")>
+                            @asiento.ToString("00")
+                        </button>
+
+                        if (asiento % 4 == 2)
+                        {
+                            <div class="aisle"></div>
+                        }
+
+                        if (asiento % 4 == 0)
+                        {
+                            <div class="row-break"></div>
+                        }
+                    }
+
+                </div>
+
+                <div class="seat-legend mt-4">
+                    <span><span class="legend-box available"></span> Disponible</span>
+                    <span><span class="legend-box occupied"></span> Ocupado</span>
+                    <span><span class="legend-box selected"></span> Seleccionado</span>
+                </div>
+
+                <div class="mt-3">
+                    <strong>Asiento seleccionado:</strong>
+                    <span id="asientoSeleccionadoTexto" class="text-muted">Ninguno</span>
+                </div>
+
+                <span asp-validation-for="NumeroAsiento" class="text-danger"></span>
+
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-ticket-perforated"></i> Reservar
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div class="card app-card">
+    <div class="card-body table-wrapper">
+
+        @if (reservas.Count == 0)
+        {
+            <div class="alert alert-info">
+                No hay pasajeros embarcados en este viaje.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle app-table w-100">
+                    <thead>
+                        <tr>
+                            <th>Pasajero</th>
+                            <th>Identificación</th>
+                            <th>Asiento</th>
+                            <th>Monto pagado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var item in reservas)
+                        {
+                            <tr>
+                                <td>@item.Pasajero?.Nombre @item.Pasajero?.Apellidos</td>
+                                <td>@item.Pasajero?.Identificacion</td>
+                                <td>@item.NumeroAsiento</td>
+                                <td>₡@item.MontoPagado.ToString("N2")</td>
+                                <td class="text-end">
+                                    <form asp-action="CancelarReserva" method="post" class="d-inline">
+                                        <input type="hidden" name="reservaId" value="@item.Id" />
+                                        <input type="hidden" name="viajeId" value="@Model.ViajeId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('¿Desea cancelar esta reserva?');">
+                                            <i class="bi bi-trash"></i> Cancelar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const seats = document.querySelectorAll(".seat.available");
+        const inputAsiento = document.getElementById("NumeroAsiento");
+        const textoAsiento = document.getElementById("asientoSeleccionadoTexto");
+
+        seats.forEach(seat => {
+            seat.addEventListener("click", function () {
+                seats.forEach(s => s.classList.remove("selected"));
+
+                this.classList.add("selected");
+
+                const numero = this.getAttribute("data-seat");
+                inputAsiento.value = numero;
+                textoAsiento.textContent = numero;
+            });
+        });
+    </script>
+}

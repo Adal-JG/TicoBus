@@ -25,7 +25,8 @@ builder.Services.AddScoped<UnidadRepository>();
 builder.Services.AddScoped<IUnidadService, UnidadService>();
 builder.Services.AddScoped<ViajeRepository>();
 builder.Services.AddScoped<IViajeService, ViajeService>();
-
+builder.Services.AddScoped<ReservaRepository>();
+builder.Services.AddScoped<IReservaService, ReservaService>();
 
 
 

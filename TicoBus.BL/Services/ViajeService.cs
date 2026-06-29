@@ -8,6 +8,33 @@ namespace TicoBus.BL.Services
     {
         private readonly ViajeRepository _viajeRepository;
 
+        public List<Viaje> ListarEnCurso()
+        {
+            return _viajeRepository.ListarEnCurso();
+        }
+
+        public bool Finalizar(int id, out string mensaje)
+        {
+            var viaje = _viajeRepository.ObtenerPorId(id);
+
+            if (viaje == null)
+            {
+                mensaje = "Viaje no encontrado.";
+                return false;
+            }
+
+            if (viaje.Estado != EstadoViaje.EnCurso)
+            {
+                mensaje = "Solo se pueden finalizar viajes en estado En Curso.";
+                return false;
+            }
+
+            _viajeRepository.Finalizar(viaje);
+
+            mensaje = "Viaje finalizado correctamente.";
+            return true;
+        }
+
         public ViajeService(ViajeRepository viajeRepository)
         {
             _viajeRepository = viajeRepository;
