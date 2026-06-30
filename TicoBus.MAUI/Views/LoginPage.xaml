@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="TicoBus.MAUI.Views.LoginPage"
+    NavigationPage.HasNavigationBar="False"
+    BackgroundColor="#F4F7FA">
+
+    <Grid RowDefinitions="190,*,Auto">
+
+        <Border
+            Grid.Row="0"
+            BackgroundColor="#0D2B45"
+            StrokeThickness="0">
+
+            <VerticalStackLayout
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Spacing="8">
+
+                <Label
+                    Text="🚌"
+                    FontSize="38"
+                    HorizontalOptions="Center"/>
+
+                <Label
+                    Text="TicoBus"
+                    FontSize="36"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+        </Border>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout
+                Padding="38,35,38,20"
+                Spacing="18">
+
+                <Label
+                    Text="Bienvenido"
+                    FontSize="30"
+                    FontAttributes="Bold"
+                    TextColor="#0D2B45"/>
+
+                <Label
+                    Text="Sistema de Transporte Interurbano"
+                    FontSize="16"
+                    TextColor="#6B7280"/>
+
+                <Entry
+                    Placeholder="Nombre de usuario"
+                    Text="{Binding NombreUsuario}"
+                    TextColor="#111827"
+                    PlaceholderColor="#9CA3AF"
+                    BackgroundColor="White"
+                    HeightRequest="58"/>
+
+                <Entry
+                    Placeholder="Contraseña"
+                    Text="{Binding Clave}"
+                    IsPassword="True"
+                    TextColor="#111827"
+                    PlaceholderColor="#9CA3AF"
+                    BackgroundColor="White"
+                    HeightRequest="58"/>
+
+                <Label
+                    Text="{Binding MensajeError}"
+                    TextColor="Red"
+                    FontAttributes="Bold"/>
+
+                <ActivityIndicator
+                    IsRunning="{Binding EstaCargando}"
+                    IsVisible="{Binding EstaCargando}"
+                    Color="#0D2B45"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid
+            Grid.Row="2"
+            Padding="38,10,38,25"
+            BackgroundColor="#F4F7FA">
+
+            <Button
+                Text="Ingresar"
+                Command="{Binding LoginCommand}"
+                BackgroundColor="#0D2B45"
+                TextColor="White"
+                CornerRadius="14"
+                HeightRequest="58"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>
