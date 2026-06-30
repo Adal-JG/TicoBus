@@ -28,33 +28,90 @@ namespace TicoBus.UI.Controllers
             ViewBag.Nombre = HttpContext.Session.GetString("Nombre");
             ViewBag.Rol = rol;
 
-            if (rol == "Chofer" && usuarioId != null)
+            if (rol == "Chofer")
             {
-                var datos = await _dashboardApiClient.ObtenerChofer(usuarioId.Value);
+                ViewBag.ViajesHoyJson = "[]";
+                ViewBag.ProximoViajeJson = "null";
+                ViewBag.TotalViajesHoy = 0;
+                ViewBag.PasajerosRegistrados = 0;
+                ViewBag.AsientosDisponibles = 0;
 
-                if (datos != null)
+                if (usuarioId != null)
                 {
-                    ViewBag.ViajesHoyJson = datos.Value.GetProperty("viajesHoy").GetRawText();
-                    ViewBag.ProximoViajeJson = datos.Value.GetProperty("proximoViaje").GetRawText();
-                    ViewBag.TotalViajesHoy = datos.Value.GetProperty("totalViajesHoy").GetInt32();
-                    ViewBag.PasajerosRegistrados = datos.Value.GetProperty("pasajerosRegistrados").GetInt32();
-                    ViewBag.AsientosDisponibles = datos.Value.GetProperty("asientosDisponibles").GetInt32();
+                    try
+                    {
+                        var datos = await _dashboardApiClient.ObtenerChofer(usuarioId.Value);
+
+                        if (datos != null)
+                        {
+                            var json = datos.Value;
+
+                            if (json.TryGetProperty("viajesHoy", out var viajesHoy))
+                                ViewBag.ViajesHoyJson = viajesHoy.GetRawText();
+
+                            if (json.TryGetProperty("proximoViaje", out var proximoViaje))
+                                ViewBag.ProximoViajeJson = proximoViaje.GetRawText();
+
+                            if (json.TryGetProperty("totalViajesHoy", out var totalViajesHoy))
+                                ViewBag.TotalViajesHoy = totalViajesHoy.GetInt32();
+
+                            if (json.TryGetProperty("pasajerosRegistrados", out var pasajerosRegistrados))
+                                ViewBag.PasajerosRegistrados = pasajerosRegistrados.GetInt32();
+
+                            if (json.TryGetProperty("asientosDisponibles", out var asientosDisponibles))
+                                ViewBag.AsientosDisponibles = asientosDisponibles.GetInt32();
+                        }
+                    }
+                    catch
+                    {
+                        TempData["Error"] = "No se pudo cargar la información del dashboard del chofer.";
+                    }
                 }
 
                 return View("Chofer");
             }
 
-            var admin = await _dashboardApiClient.ObtenerAdmin();
-
-            if (admin != null)
+            try
             {
-                ViewBag.TotalChoferes = admin.Value.GetProperty("totalChoferes").GetInt32();
-                ViewBag.TotalPasajeros = admin.Value.GetProperty("totalPasajeros").GetInt32();
-                ViewBag.TotalRutas = admin.Value.GetProperty("totalRutas").GetInt32();
-                ViewBag.TotalUnidades = admin.Value.GetProperty("totalUnidades").GetInt32();
-                ViewBag.TotalViajesProgramados = admin.Value.GetProperty("totalViajesProgramados").GetInt32();
-                ViewBag.TotalViajesEnCurso = admin.Value.GetProperty("totalViajesEnCurso").GetInt32();
-                ViewBag.TotalViajesCancelados = admin.Value.GetProperty("totalViajesCancelados").GetInt32();
+                var admin = await _dashboardApiClient.ObtenerAdmin();
+
+                ViewBag.TotalChoferes = 0;
+                ViewBag.TotalPasajeros = 0;
+                ViewBag.TotalRutas = 0;
+                ViewBag.TotalUnidades = 0;
+                ViewBag.TotalViajesProgramados = 0;
+                ViewBag.TotalViajesEnCurso = 0;
+                ViewBag.TotalViajesCancelados = 0;
+
+                if (admin != null)
+                {
+                    var json = admin.Value;
+
+                    if (json.TryGetProperty("totalChoferes", out var totalChoferes))
+                        ViewBag.TotalChoferes = totalChoferes.GetInt32();
+
+                    if (json.TryGetProperty("totalPasajeros", out var totalPasajeros))
+                        ViewBag.TotalPasajeros = totalPasajeros.GetInt32();
+
+                    if (json.TryGetProperty("totalRutas", out var totalRutas))
+                        ViewBag.TotalRutas = totalRutas.GetInt32();
+
+                    if (json.TryGetProperty("totalUnidades", out var totalUnidades))
+                        ViewBag.TotalUnidades = totalUnidades.GetInt32();
+
+                    if (json.TryGetProperty("totalViajesProgramados", out var totalViajesProgramados))
+                        ViewBag.TotalViajesProgramados = totalViajesProgramados.GetInt32();
+
+                    if (json.TryGetProperty("totalViajesEnCurso", out var totalViajesEnCurso))
+                        ViewBag.TotalViajesEnCurso = totalViajesEnCurso.GetInt32();
+
+                    if (json.TryGetProperty("totalViajesCancelados", out var totalViajesCancelados))
+                        ViewBag.TotalViajesCancelados = totalViajesCancelados.GetInt32();
+                }
+            }
+            catch
+            {
+                TempData["Error"] = "No se pudo cargar la información del dashboard.";
             }
 
             return View();
