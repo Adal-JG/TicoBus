@@ -11,7 +11,7 @@ namespace TicoBus.UI.ApiClients
 
         public async Task<List<Reserva>> ListarPorUsuario(int usuarioId)
         {
-            var response = await GetAsync<List<Reserva>>($"MisViajes/usuario/{usuarioId}");
+            var response = await GetAsync<List<Reserva>>($"MisViajes/{usuarioId}");
             return response?.Datos ?? new List<Reserva>();
         }
     }

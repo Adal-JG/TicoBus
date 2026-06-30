@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ApiKeyFilter>();
+    //options.Filters.Add<ApiKeyFilter>();
 })
 .AddJsonOptions(options =>
 {
