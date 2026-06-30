@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
 using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class RutasController : BaseController
     {
-        private readonly IRutaService _rutaService;
+        private readonly RutasApiClient _rutasApiClient;
 
-        public RutasController(IRutaService rutaService)
+        public RutasController(RutasApiClient rutasApiClient)
         {
-            _rutaService = rutaService;
+            _rutasApiClient = rutasApiClient;
         }
 
-        public IActionResult Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -24,7 +24,8 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var rutas = _rutaService.Listar(filtro);
+
+            var rutas = await _rutasApiClient.Listar(filtro);
 
             return View(rutas);
         }
@@ -43,7 +44,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(RutaViewModel model)
+        public async Task<IActionResult> Create(RutaViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -59,20 +60,20 @@ namespace TicoBus.UI.Controllers
 
             var ruta = ConvertirAEntidad(model);
 
-            var resultado = _rutaService.Agregar(ruta, out string mensaje);
+            var response = await _rutasApiClient.Agregar(ruta);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo registrar la ruta.");
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -81,7 +82,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var ruta = _rutaService.ObtenerPorId(id);
+            var ruta = await _rutasApiClient.ObtenerPorId(id);
 
             if (ruta == null)
             {
@@ -103,7 +104,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(RutaViewModel model)
+        public async Task<IActionResult> Edit(RutaViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -119,39 +120,22 @@ namespace TicoBus.UI.Controllers
 
             var ruta = ConvertirAEntidad(model);
 
-            var resultado = _rutaService.Actualizar(ruta, out string mensaje);
+            var response = await _rutasApiClient.Actualizar(model.Id, ruta);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo actualizar la ruta.");
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var validacion = ValidarRol("Administrador", "Chofer");
-
-            if (validacion != null)
-            {
-                return validacion;
-            }
-
-            var resultado = _rutaService.Eliminar(id, out string mensaje);
-
-            if (resultado)
-            {
-                TempData["Exito"] = mensaje;
-            }
-            else
-            {
-                TempData["Error"] = mensaje;
-            }
-
+            TempData["Error"] = "La eliminación de rutas no está habilitada en esta segunda entrega.";
             return RedirectToAction("Index");
         }
 

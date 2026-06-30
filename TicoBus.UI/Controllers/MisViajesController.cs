@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
+using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 
 namespace TicoBus.UI.Controllers
 {
     public class MisViajesController : BaseController
     {
-        private readonly IPasajeroService _pasajeroService;
-        private readonly IReservaService _reservaService;
+        private readonly MisViajesApiClient _misViajesApiClient;
 
-        public MisViajesController(
-            IPasajeroService pasajeroService,
-            IReservaService reservaService)
+        public MisViajesController(MisViajesApiClient misViajesApiClient)
         {
-            _pasajeroService = pasajeroService;
-            _reservaService = reservaService;
+            _misViajesApiClient = misViajesApiClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var validacion = ValidarRol("Pasajero");
 
@@ -32,20 +29,12 @@ namespace TicoBus.UI.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var pasajero = _pasajeroService.ObtenerPorUsuarioId(usuarioId.Value);
-
-            if (pasajero == null)
-            {
-                TempData["Error"] = "No se encontró el pasajero asociado al usuario.";
-                return View(new List<TicoBus.Model.Reserva>());
-            }
-
-            var reservas = _reservaService.ListarPorPasajero(pasajero.Id);
+            var reservas = await _misViajesApiClient.ListarPorUsuario(usuarioId.Value);
 
             return View(reservas);
         }
 
-        public IActionResult Detalle(int id)
+        public async Task<IActionResult> Detalle(int id)
         {
             var validacion = ValidarRol("Pasajero");
 
@@ -61,15 +50,7 @@ namespace TicoBus.UI.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var pasajero = _pasajeroService.ObtenerPorUsuarioId(usuarioId.Value);
-
-            if (pasajero == null)
-            {
-                TempData["Error"] = "No se encontró el pasajero asociado al usuario.";
-                return RedirectToAction("Index");
-            }
-
-            var reservas = _reservaService.ListarPorPasajero(pasajero.Id);
+            var reservas = await _misViajesApiClient.ListarPorUsuario(usuarioId.Value);
             var reserva = reservas.FirstOrDefault(r => r.Id == id);
 
             if (reserva == null)

@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
 using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class PasajerosController : BaseController
     {
-        private readonly IPasajeroService _pasajeroService;
+        private readonly PasajerosApiClient _pasajerosApiClient;
 
-        public PasajerosController(IPasajeroService pasajeroService)
+        public PasajerosController(PasajerosApiClient pasajerosApiClient)
         {
-            _pasajeroService = pasajeroService;
+            _pasajerosApiClient = pasajerosApiClient;
         }
 
-        public IActionResult Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro)
         {
             var validacion = ValidarRol("Chofer");
 
@@ -24,7 +24,8 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var pasajeros = _pasajeroService.Listar(filtro);
+
+            var pasajeros = await _pasajerosApiClient.Listar(filtro);
 
             return View(pasajeros);
         }
@@ -43,7 +44,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(PasajeroViewModel model)
+        public async Task<IActionResult> Create(PasajeroViewModel model)
         {
             var validacion = ValidarRol("Chofer");
 
@@ -65,20 +66,20 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _pasajeroService.Agregar(pasajero, out string mensaje);
+            var response = await _pasajerosApiClient.Agregar(pasajero);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ViewBag.Error = mensaje;
+                ViewBag.Error = response?.Mensaje ?? "No se pudo registrar el pasajero.";
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var validacion = ValidarRol("Chofer");
 
@@ -87,10 +88,11 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var pasajero = _pasajeroService.ObtenerPorId(id);
+            var pasajero = await _pasajerosApiClient.ObtenerPorId(id);
 
             if (pasajero == null)
             {
+                TempData["Error"] = "Pasajero no encontrado.";
                 return RedirectToAction("Index");
             }
 
@@ -107,7 +109,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(PasajeroViewModel model)
+        public async Task<IActionResult> Edit(PasajeroViewModel model)
         {
             var validacion = ValidarRol("Chofer");
 
@@ -130,39 +132,22 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _pasajeroService.Actualizar(pasajero, out string mensaje);
+            var response = await _pasajerosApiClient.Actualizar(model.Id, pasajero);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ViewBag.Error = mensaje;
+                ViewBag.Error = response?.Mensaje ?? "No se pudo actualizar el pasajero.";
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var validacion = ValidarRol("Chofer");
-
-            if (validacion != null)
-            {
-                return validacion;
-            }
-
-            var resultado = _pasajeroService.Eliminar(id, out string mensaje);
-
-            if (resultado)
-            {
-                TempData["Exito"] = mensaje;
-            }
-            else
-            {
-                TempData["Error"] = mensaje;
-            }
-
+            TempData["Error"] = "La eliminación de pasajeros no está habilitada en esta segunda entrega.";
             return RedirectToAction("Index");
         }
     }

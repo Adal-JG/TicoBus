@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.DA.Repositories;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class PerfilController : BaseController
     {
-        private readonly UsuarioRepository _usuarioRepository;
+        private readonly PerfilApiClient _perfilApiClient;
 
-        public PerfilController(UsuarioRepository usuarioRepository)
+        public PerfilController(PerfilApiClient perfilApiClient)
         {
-            _usuarioRepository = usuarioRepository;
+            _perfilApiClient = perfilApiClient;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var validacion = ValidarSesion();
 
@@ -30,7 +30,7 @@ namespace TicoBus.UI.Controllers
                 return RedirectToAction("Index", "Login");
             }
 
-            var usuario = _usuarioRepository.ObtenerPorId(usuarioId.Value);
+            var usuario = await _perfilApiClient.ObtenerUsuario(usuarioId.Value);
 
             if (usuario == null)
             {
@@ -51,7 +51,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(PerfilViewModel model)
+        public async Task<IActionResult> Index(PerfilViewModel model)
         {
             var validacion = ValidarSesion();
 
@@ -60,7 +60,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var usuario = _usuarioRepository.ObtenerPorId(model.Id);
+            var usuario = await _perfilApiClient.ObtenerUsuario(model.Id);
 
             if (usuario == null)
             {
@@ -77,26 +77,45 @@ namespace TicoBus.UI.Controllers
                 return View(model);
             }
 
-            usuario.Correo = model.Correo;
+            var correoResponse = await _perfilApiClient.ActualizarCorreo(model.Id, model.Correo);
+
+            if (correoResponse == null || !correoResponse.Exitoso)
+            {
+                ModelState.AddModelError("", correoResponse?.Mensaje ?? "No se pudo actualizar el perfil.");
+                return View(model);
+            }
 
             if (!string.IsNullOrWhiteSpace(model.NuevaClave))
             {
                 if (string.IsNullOrWhiteSpace(model.ClaveActual))
                 {
                     ModelState.AddModelError("", "Debe ingresar la clave actual.");
+
+                    model.NombreUsuario = usuario.NombreUsuario;
+                    model.NombreCompleto = usuario.NombreCompleto;
+                    model.Rol = usuario.Rol.ToString();
+                    model.FechaCreacion = usuario.FechaCreacion;
+
                     return View(model);
                 }
 
-                if (usuario.Clave != model.ClaveActual)
+                var claveResponse = await _perfilApiClient.CambiarClave(
+                    usuario.NombreUsuario,
+                    model.ClaveActual,
+                    model.NuevaClave);
+
+                if (claveResponse == null || !claveResponse.Exitoso)
                 {
-                    ModelState.AddModelError("", "La clave actual no es correcta.");
+                    ModelState.AddModelError("", claveResponse?.Mensaje ?? "No se pudo cambiar la clave.");
+
+                    model.NombreUsuario = usuario.NombreUsuario;
+                    model.NombreCompleto = usuario.NombreCompleto;
+                    model.Rol = usuario.Rol.ToString();
+                    model.FechaCreacion = usuario.FechaCreacion;
+
                     return View(model);
                 }
-
-                usuario.Clave = model.NuevaClave;
             }
-
-            _usuarioRepository.Actualizar(usuario);
 
             HttpContext.Session.SetString("Nombre", usuario.NombreCompleto);
 

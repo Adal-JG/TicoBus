@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
-using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly ILoginService _loginService;
+        private readonly AuthApiClient _authApiClient;
 
-        public LoginController(ILoginService loginService)
+        public LoginController(AuthApiClient authApiClient)
         {
-            _loginService = loginService;
+            _authApiClient = authApiClient;
         }
 
         [HttpGet]
@@ -21,32 +20,31 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(LoginViewModel model)
+        public async Task<IActionResult> Index(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var usuario = _loginService.Login(model.NombreUsuario, model.Clave, out string mensaje);
+            var resultado = await _authApiClient.Login(model.NombreUsuario, model.Clave);
 
-            if (usuario == null)
+            if (resultado == null || !resultado.Exitoso || resultado.UsuarioId == null)
             {
-                ViewBag.Error = mensaje;
+                ViewBag.Error = resultado?.Mensaje ?? "Credenciales incorrectas.";
                 return View(model);
             }
 
-            HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
-            HttpContext.Session.SetString("Nombre", usuario.NombreCompleto);
-            HttpContext.Session.SetString("Rol", usuario.Rol.ToString());
+            HttpContext.Session.SetInt32("UsuarioId", resultado.UsuarioId.Value);
+            HttpContext.Session.SetString("Nombre", resultado.Nombre ?? "");
+            HttpContext.Session.SetString("Rol", resultado.Rol ?? "");
 
-            return usuario.Rol switch
+            if (resultado.Rol == "Pasajero")
             {
-                RolUsuario.Administrador => RedirectToAction("Index", "Dashboard"),
-                RolUsuario.Chofer => RedirectToAction("Index", "Dashboard"),
-                RolUsuario.Pasajero => RedirectToAction("Index", "MisViajes"),
-                _ => RedirectToAction("Index", "Login")
-            };
+                return RedirectToAction("Index", "MisViajes");
+            }
+
+            return RedirectToAction("Index", "Dashboard");
         }
 
         public IActionResult Logout()

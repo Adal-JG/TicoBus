@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
 using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class UnidadesController : BaseController
     {
-        private readonly IUnidadService _unidadService;
+        private readonly UnidadesApiClient _unidadesApiClient;
 
-        public UnidadesController(IUnidadService unidadService)
+        public UnidadesController(UnidadesApiClient unidadesApiClient)
         {
-            _unidadService = unidadService;
+            _unidadesApiClient = unidadesApiClient;
         }
 
-        public IActionResult Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -24,7 +24,8 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var unidades = _unidadService.Listar(filtro);
+
+            var unidades = await _unidadesApiClient.Listar(filtro);
 
             return View(unidades);
         }
@@ -43,7 +44,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(UnidadViewModel model)
+        public async Task<IActionResult> Create(UnidadViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -59,20 +60,20 @@ namespace TicoBus.UI.Controllers
 
             var unidad = ConvertirAEntidad(model);
 
-            var resultado = _unidadService.Agregar(unidad, out string mensaje);
+            var response = await _unidadesApiClient.Agregar(unidad);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo registrar la unidad.");
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -81,7 +82,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var unidad = _unidadService.ObtenerPorId(id);
+            var unidad = await _unidadesApiClient.ObtenerPorId(id);
 
             if (unidad == null)
             {
@@ -102,7 +103,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(UnidadViewModel model)
+        public async Task<IActionResult> Edit(UnidadViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -118,39 +119,22 @@ namespace TicoBus.UI.Controllers
 
             var unidad = ConvertirAEntidad(model);
 
-            var resultado = _unidadService.Actualizar(unidad, out string mensaje);
+            var response = await _unidadesApiClient.Actualizar(model.Id, unidad);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo actualizar la unidad.");
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var validacion = ValidarRol("Administrador", "Chofer");
-
-            if (validacion != null)
-            {
-                return validacion;
-            }
-
-            var resultado = _unidadService.Eliminar(id, out string mensaje);
-
-            if (resultado)
-            {
-                TempData["Exito"] = mensaje;
-            }
-            else
-            {
-                TempData["Error"] = mensaje;
-            }
-
+            TempData["Error"] = "La eliminación de unidades no está habilitada en esta segunda entrega.";
             return RedirectToAction("Index");
         }
 

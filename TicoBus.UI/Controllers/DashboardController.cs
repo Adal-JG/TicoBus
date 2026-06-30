@@ -1,27 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
-using TicoBus.DA.Repositories;
-using TicoBus.Model;
+using System.Text.Json;
+using TicoBus.UI.ApiClients;
 
 namespace TicoBus.UI.Controllers
 {
     public class DashboardController : BaseController
     {
-        private readonly DashboardRepository _dashboardRepository;
-        private readonly IChoferService _choferService;
-        private readonly IViajeService _viajeService;
+        private readonly DashboardApiClient _dashboardApiClient;
 
-        public DashboardController(
-            DashboardRepository dashboardRepository,
-            IChoferService choferService,
-            IViajeService viajeService)
+        public DashboardController(DashboardApiClient dashboardApiClient)
         {
-            _dashboardRepository = dashboardRepository;
-            _choferService = choferService;
-            _viajeService = viajeService;
+            _dashboardApiClient = dashboardApiClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -38,31 +30,32 @@ namespace TicoBus.UI.Controllers
 
             if (rol == "Chofer" && usuarioId != null)
             {
-                var chofer = _choferService.ObtenerPorUsuarioId(usuarioId.Value);
+                var datos = await _dashboardApiClient.ObtenerChofer(usuarioId.Value);
 
-                if (chofer != null)
+                if (datos != null)
                 {
-                    var viajesHoy = _viajeService.ListarPorChoferHoy(chofer.Id);
-                    var proximoViaje = _viajeService.ObtenerProximoViajeChofer(chofer.Id);
-
-                    ViewBag.ViajesHoy = viajesHoy;
-                    ViewBag.ProximoViaje = proximoViaje;
-                    ViewBag.TotalViajesHoy = viajesHoy.Count;
-                    ViewBag.PasajerosRegistrados = viajesHoy.Sum(v => v.Reservas?.Count(r => r.Activa) ?? 0);
-                    ViewBag.AsientosDisponibles = viajesHoy.Sum(v =>
-                        (v.Unidad?.CapacidadPasajeros ?? 0) - (v.Reservas?.Count(r => r.Activa) ?? 0));
+                    ViewBag.ViajesHoyJson = datos.Value.GetProperty("viajesHoy").GetRawText();
+                    ViewBag.ProximoViajeJson = datos.Value.GetProperty("proximoViaje").GetRawText();
+                    ViewBag.TotalViajesHoy = datos.Value.GetProperty("totalViajesHoy").GetInt32();
+                    ViewBag.PasajerosRegistrados = datos.Value.GetProperty("pasajerosRegistrados").GetInt32();
+                    ViewBag.AsientosDisponibles = datos.Value.GetProperty("asientosDisponibles").GetInt32();
                 }
 
                 return View("Chofer");
             }
 
-            ViewBag.TotalChoferes = _dashboardRepository.TotalChoferes();
-            ViewBag.TotalPasajeros = _dashboardRepository.TotalPasajeros();
-            ViewBag.TotalRutas = _dashboardRepository.TotalRutas();
-            ViewBag.TotalUnidades = _dashboardRepository.TotalUnidades();
-            ViewBag.TotalViajesProgramados = _dashboardRepository.TotalViajesProgramados();
-            ViewBag.TotalViajesEnCurso = _dashboardRepository.TotalViajesEnCurso();
-            ViewBag.TotalViajesCancelados = _dashboardRepository.TotalViajesCancelados();
+            var admin = await _dashboardApiClient.ObtenerAdmin();
+
+            if (admin != null)
+            {
+                ViewBag.TotalChoferes = admin.Value.GetProperty("totalChoferes").GetInt32();
+                ViewBag.TotalPasajeros = admin.Value.GetProperty("totalPasajeros").GetInt32();
+                ViewBag.TotalRutas = admin.Value.GetProperty("totalRutas").GetInt32();
+                ViewBag.TotalUnidades = admin.Value.GetProperty("totalUnidades").GetInt32();
+                ViewBag.TotalViajesProgramados = admin.Value.GetProperty("totalViajesProgramados").GetInt32();
+                ViewBag.TotalViajesEnCurso = admin.Value.GetProperty("totalViajesEnCurso").GetInt32();
+                ViewBag.TotalViajesCancelados = admin.Value.GetProperty("totalViajesCancelados").GetInt32();
+            }
 
             return View();
         }

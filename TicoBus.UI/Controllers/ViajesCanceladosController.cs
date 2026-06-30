@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
+using TicoBus.UI.ApiClients;
 
 namespace TicoBus.UI.Controllers
 {
     public class ViajesCanceladosController : BaseController
     {
-        private readonly IViajeService _viajeService;
+        private readonly ViajesCanceladosApiClient _viajesCanceladosApiClient;
 
-        public ViajesCanceladosController(IViajeService viajeService)
+        public ViajesCanceladosController(ViajesCanceladosApiClient viajesCanceladosApiClient)
         {
-            _viajeService = viajeService;
+            _viajesCanceladosApiClient = viajesCanceladosApiClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var validacion = ValidarRol("Administrador");
 
@@ -21,12 +21,12 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viajes = _viajeService.ListarCancelados();
+            var viajes = await _viajesCanceladosApiClient.Listar();
 
             return View(viajes);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var validacion = ValidarRol("Administrador");
 
@@ -35,7 +35,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viaje = _viajeService.ObtenerPorId(id);
+            var viaje = await _viajesCanceladosApiClient.ObtenerPorId(id);
 
             if (viaje == null)
             {

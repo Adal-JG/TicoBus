@@ -1,6 +1,0 @@
-@TicoBus.SI_HostAddress = http://localhost:5110
-
-GET {{TicoBus.SI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

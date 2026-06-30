@@ -1,27 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using TicoBus.BL.Interfaces;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class ViajesEnCursoController : BaseController
     {
-        private readonly IViajeService _viajeService;
-        private readonly IReservaService _reservaService;
-        private readonly IPasajeroService _pasajeroService;
+        private readonly ViajesEnCursoApiClient _viajesEnCursoApiClient;
+        private readonly PasajerosApiClient _pasajerosApiClient;
 
         public ViajesEnCursoController(
-            IViajeService viajeService,
-            IReservaService reservaService,
-            IPasajeroService pasajeroService)
+            ViajesEnCursoApiClient viajesEnCursoApiClient,
+            PasajerosApiClient pasajerosApiClient)
         {
-            _viajeService = viajeService;
-            _reservaService = reservaService;
-            _pasajeroService = pasajeroService;
+            _viajesEnCursoApiClient = viajesEnCursoApiClient;
+            _pasajerosApiClient = pasajerosApiClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -30,12 +27,12 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viajes = _viajeService.ListarEnCurso();
+            var viajes = await _viajesEnCursoApiClient.Listar();
 
             return View(viajes);
         }
 
-        public IActionResult Administrar(int id)
+        public async Task<IActionResult> Administrar(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -44,7 +41,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viaje = _viajeService.ObtenerPorId(id);
+            var viaje = await _viajesEnCursoApiClient.ObtenerPorId(id);
 
             if (viaje == null)
             {
@@ -52,13 +49,14 @@ namespace TicoBus.UI.Controllers
                 return RedirectToAction("Index");
             }
 
-            var reservas = _reservaService.ListarPorViaje(id);
+            var reservas = await _viajesEnCursoApiClient.ListarReservas(id);
+            var pasajeros = await _pasajerosApiClient.Listar(null);
 
             ViewBag.Reservas = reservas;
             ViewBag.AsientosOcupados = reservas.Select(r => r.NumeroAsiento).ToList();
 
             ViewBag.Pasajeros = new SelectList(
-                _pasajeroService.Listar(null).Select(p => new
+                pasajeros.Select(p => new
                 {
                     p.Id,
                     NombreCompleto = $"{p.Nombre} {p.Apellidos} - {p.Identificacion}"
@@ -66,8 +64,8 @@ namespace TicoBus.UI.Controllers
                 "Id",
                 "NombreCompleto");
 
-            ViewBag.Ocupados = _reservaService.CantidadReservasActivas(id);
-            ViewBag.Total = _reservaService.TotalRecaudado(id);
+            ViewBag.Ocupados = reservas.Count(r => r.Activa);
+            ViewBag.Total = reservas.Where(r => r.Activa).Sum(r => r.MontoPagado);
             ViewBag.Capacidad = viaje.Unidad?.CapacidadPasajeros ?? 0;
 
             return View(new ReservaViewModel
@@ -77,7 +75,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Reservar(ReservaViewModel model)
+        public async Task<IActionResult> Reservar(ReservaViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -86,19 +84,19 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var resultado = _reservaService.Reservar(
+            var response = await _viajesEnCursoApiClient.Reservar(
                 model.ViajeId,
                 model.PasajeroId,
-                model.NumeroAsiento,
-                out string mensaje);
+                model.NumeroAsiento);
 
-            TempData[resultado ? "Exito" : "Error"] = mensaje;
+            TempData[response != null && response.Exitoso ? "Exito" : "Error"] =
+                response?.Mensaje ?? "No se pudo registrar la reserva.";
 
             return RedirectToAction("Administrar", new { id = model.ViajeId });
         }
 
         [HttpPost]
-        public IActionResult CancelarReserva(int reservaId, int viajeId)
+        public async Task<IActionResult> CancelarReserva(int reservaId, int viajeId)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -107,31 +105,16 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var resultado = _reservaService.CancelarReserva(reservaId, out string mensaje);
-            TempData[resultado ? "Exito" : "Error"] = mensaje;
+            var response = await _viajesEnCursoApiClient.CancelarReserva(reservaId);
+
+            TempData[response != null && response.Exitoso ? "Exito" : "Error"] =
+                response?.Mensaje ?? "No se pudo cancelar la reserva.";
 
             return RedirectToAction("Administrar", new { id = viajeId });
         }
 
         [HttpGet]
-        public IActionResult Finalizar(int id)
-        {
-            var viaje = _viajeService.ObtenerPorId(id);
-
-            if (viaje == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.Reservas = _reservaService.ListarPorViaje(id);
-            ViewBag.Ocupados = _reservaService.CantidadReservasActivas(id);
-            ViewBag.Total = _reservaService.TotalRecaudado(id);
-
-            return View("Finalizar", viaje);
-        }
-
-        [HttpPost]
-        public IActionResult ConfirmarFinalizar(int id)
+        public async Task<IActionResult> Finalizar(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -140,8 +123,37 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var resultado = _viajeService.Finalizar(id, out string mensaje);
-            TempData[resultado ? "Exito" : "Error"] = mensaje;
+            var viaje = await _viajesEnCursoApiClient.ObtenerPorId(id);
+
+            if (viaje == null)
+            {
+                TempData["Error"] = "Viaje no encontrado.";
+                return RedirectToAction("Index");
+            }
+
+            var reservas = await _viajesEnCursoApiClient.ListarReservas(id);
+
+            ViewBag.Reservas = reservas;
+            ViewBag.Ocupados = reservas.Count(r => r.Activa);
+            ViewBag.Total = reservas.Where(r => r.Activa).Sum(r => r.MontoPagado);
+
+            return View("Finalizar", viaje);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmarFinalizar(int id)
+        {
+            var validacion = ValidarRol("Administrador", "Chofer");
+
+            if (validacion != null)
+            {
+                return validacion;
+            }
+
+            var response = await _viajesEnCursoApiClient.Finalizar(id);
+
+            TempData[response != null && response.Exitoso ? "Exito" : "Error"] =
+                response?.Mensaje ?? "No se pudo finalizar el viaje.";
 
             return RedirectToAction("Index");
         }

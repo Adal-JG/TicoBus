@@ -1,31 +1,31 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using TicoBus.BL.Interfaces;
 using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class ViajesController : BaseController
     {
-        private readonly IViajeService _viajeService;
-        private readonly IRutaService _rutaService;
-        private readonly IUnidadService _unidadService;
-        private readonly IChoferService _choferService;
+        private readonly ViajesApiClient _viajesApiClient;
+        private readonly RutasApiClient _rutasApiClient;
+        private readonly UnidadesApiClient _unidadesApiClient;
+        private readonly ChoferesApiClient _choferesApiClient;
 
         public ViajesController(
-            IViajeService viajeService,
-            IRutaService rutaService,
-            IUnidadService unidadService,
-            IChoferService choferService)
+            ViajesApiClient viajesApiClient,
+            RutasApiClient rutasApiClient,
+            UnidadesApiClient unidadesApiClient,
+            ChoferesApiClient choferesApiClient)
         {
-            _viajeService = viajeService;
-            _rutaService = rutaService;
-            _unidadService = unidadService;
-            _choferService = choferService;
+            _viajesApiClient = viajesApiClient;
+            _rutasApiClient = rutasApiClient;
+            _unidadesApiClient = unidadesApiClient;
+            _choferesApiClient = choferesApiClient;
         }
 
-        public IActionResult Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -35,13 +35,14 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var viajes = _viajeService.Listar(filtro);
+
+            var viajes = await _viajesApiClient.Listar(filtro);
 
             return View(viajes);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -50,16 +51,17 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            CargarListas();
+            await CargarListas();
+
             return View(new ViajeViewModel
             {
-                FechaHoraSalida = DateTime.Now,
-                FechaHoraLlegadaEstimada = DateTime.Now.AddHours(2)
+                FechaHoraSalida = RedondearMinutos(DateTime.Now),
+                FechaHoraLlegadaEstimada = RedondearMinutos(DateTime.Now.AddHours(2))
             });
         }
 
         [HttpPost]
-        public IActionResult Create(ViajeViewModel model)
+        public async Task<IActionResult> Create(ViajeViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -70,26 +72,27 @@ namespace TicoBus.UI.Controllers
 
             if (!ModelState.IsValid)
             {
-                CargarListas();
+                await CargarListas();
                 return View(model);
             }
 
             var viaje = ConvertirAEntidad(model);
-            var resultado = _viajeService.Agregar(viaje, out string mensaje);
 
-            if (!resultado)
+            var response = await _viajesApiClient.Agregar(viaje);
+
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
-                CargarListas();
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo registrar el viaje.");
+                await CargarListas();
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -98,7 +101,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viaje = _viajeService.ObtenerPorId(id);
+            var viaje = await _viajesApiClient.ObtenerPorId(id);
 
             if (viaje == null)
             {
@@ -122,12 +125,13 @@ namespace TicoBus.UI.Controllers
                 FechaHoraLlegadaEstimada = viaje.FechaHoraLlegadaEstimada
             };
 
-            CargarListas();
+            await CargarListas();
+
             return View(model);
         }
 
         [HttpPost]
-        public IActionResult Edit(ViajeViewModel model)
+        public async Task<IActionResult> Edit(ViajeViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -138,26 +142,27 @@ namespace TicoBus.UI.Controllers
 
             if (!ModelState.IsValid)
             {
-                CargarListas();
+                await CargarListas();
                 return View(model);
             }
 
             var viaje = ConvertirAEntidad(model);
-            var resultado = _viajeService.Actualizar(viaje, out string mensaje);
 
-            if (!resultado)
+            var response = await _viajesApiClient.Actualizar(model.Id, viaje);
+
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
-                CargarListas();
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo actualizar el viaje.");
+                await CargarListas();
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public IActionResult Iniciar(int id)
+        public async Task<IActionResult> Iniciar(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -166,14 +171,16 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var resultado = _viajeService.Iniciar(id, out string mensaje);
-            TempData[resultado ? "Exito" : "Error"] = mensaje;
+            var response = await _viajesApiClient.Iniciar(id);
+
+            TempData[response != null && response.Exitoso ? "Exito" : "Error"] =
+                response?.Mensaje ?? "No se pudo iniciar el viaje.";
 
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Cancelar(int id)
+        public async Task<IActionResult> Cancelar(int id)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -182,7 +189,7 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var viaje = _viajeService.ObtenerPorId(id);
+            var viaje = await _viajesApiClient.ObtenerPorId(id);
 
             if (viaje == null)
             {
@@ -210,7 +217,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Cancelar(ViajeViewModel model)
+        public async Task<IActionResult> Cancelar(ViajeViewModel model)
         {
             var validacion = ValidarRol("Administrador", "Chofer");
 
@@ -219,15 +226,15 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var resultado = _viajeService.Cancelar(model.Id, model.MotivoCancelacion ?? "", out string mensaje);
+            var response = await _viajesApiClient.Cancelar(model.Id, model.MotivoCancelacion ?? "");
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ModelState.AddModelError("", mensaje);
+                ModelState.AddModelError("", response?.Mensaje ?? "No se pudo cancelar el viaje.");
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
@@ -244,18 +251,20 @@ namespace TicoBus.UI.Controllers
             };
         }
 
-        private void CargarListas()
+        private async Task CargarListas()
         {
-            var rutas = _rutaService.Listar(null);
+            var rutas = await _rutasApiClient.Listar(null);
+            var unidades = await _unidadesApiClient.Listar(null);
+            var choferes = await _choferesApiClient.Listar(null);
 
             ViewBag.Rutas = new SelectList(
-            rutas.Select(r => new
-            {
-                r.Id,
-                Texto = $"{r.Origen} → {r.Destino} ({(int)r.DuracionEstimada.TotalHours:00}:{r.DuracionEstimada.Minutes:00})"
-            }),
-            "Id",
-            "Texto");
+                rutas.Select(r => new
+                {
+                    r.Id,
+                    Texto = $"{r.Origen} → {r.Destino} ({(int)r.DuracionEstimada.TotalHours:00}:{r.DuracionEstimada.Minutes:00})"
+                }),
+                "Id",
+                "Texto");
 
             ViewBag.DuracionesRutas = rutas.Select(r => new
             {
@@ -263,16 +272,28 @@ namespace TicoBus.UI.Controllers
                 minutos = (int)r.DuracionEstimada.TotalMinutes
             }).ToList();
 
-            ViewBag.Unidades = new SelectList(_unidadService.Listar(null), "Id", "Placa");
+            ViewBag.Unidades = new SelectList(unidades, "Id", "Placa");
 
             ViewBag.Choferes = new SelectList(
-                _choferService.Listar(null).Select(c => new
+                choferes.Select(c => new
                 {
                     c.Id,
                     NombreCompleto = $"{c.Nombre} {c.Apellidos}"
                 }),
                 "Id",
                 "NombreCompleto");
+        }
+
+        private DateTime RedondearMinutos(DateTime fecha)
+        {
+            return new DateTime(
+                fecha.Year,
+                fecha.Month,
+                fecha.Day,
+                fecha.Hour,
+                fecha.Minute,
+                0
+            );
         }
     }
 }

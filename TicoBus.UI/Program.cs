@@ -1,8 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using TicoBus.BL.Interfaces;
 using TicoBus.BL.Services;
-using TicoBus.DA.Repositories;
-using Microsoft.EntityFrameworkCore;
 using TicoBus.DA.Data;
+using TicoBus.DA.Repositories;
+using TicoBus.UI.ApiClients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,18 @@ builder.Services.AddScoped<IViajeService, ViajeService>();
 builder.Services.AddScoped<ReservaRepository>();
 builder.Services.AddScoped<IReservaService, ReservaService>();
 
+builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<AuthApiClient>();
+builder.Services.AddHttpClient<ChoferesApiClient>();
+builder.Services.AddHttpClient<PasajerosApiClient>();
+builder.Services.AddHttpClient<RutasApiClient>();
+builder.Services.AddHttpClient<UnidadesApiClient>();
+builder.Services.AddHttpClient<ViajesApiClient>();
+builder.Services.AddHttpClient<ViajesEnCursoApiClient>();
+builder.Services.AddHttpClient<ViajesCanceladosApiClient>();
+builder.Services.AddHttpClient<MisViajesApiClient>();
+builder.Services.AddHttpClient<PerfilApiClient>();
+builder.Services.AddHttpClient<DashboardApiClient>();
 
 
 builder.Services.AddSession();

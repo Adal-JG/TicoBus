@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TicoBus.BL.Interfaces;
 using TicoBus.Model;
+using TicoBus.UI.ApiClients;
 using TicoBus.UI.Models;
 
 namespace TicoBus.UI.Controllers
 {
     public class ChoferesController : BaseController
     {
-        private readonly IChoferService _choferService;
+        private readonly ChoferesApiClient _choferesApiClient;
 
-        public ChoferesController(IChoferService choferService)
+        public ChoferesController(ChoferesApiClient choferesApiClient)
         {
-            _choferService = choferService;
+            _choferesApiClient = choferesApiClient;
         }
 
-        public IActionResult Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro)
         {
             var validacion = ValidarRol("Administrador");
 
@@ -24,7 +24,8 @@ namespace TicoBus.UI.Controllers
             }
 
             ViewBag.Filtro = filtro;
-            var choferes = _choferService.Listar(filtro);
+
+            var choferes = await _choferesApiClient.Listar(filtro);
 
             return View(choferes);
         }
@@ -43,7 +44,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(ChoferViewModel model)
+        public async Task<IActionResult> Create(ChoferViewModel model)
         {
             var validacion = ValidarRol("Administrador");
 
@@ -65,20 +66,20 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _choferService.Agregar(chofer, out string mensaje);
+            var response = await _choferesApiClient.Agregar(chofer);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ViewBag.Error = mensaje;
+                ViewBag.Error = response?.Mensaje ?? "No se pudo registrar el chofer.";
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var validacion = ValidarRol("Administrador");
 
@@ -87,10 +88,11 @@ namespace TicoBus.UI.Controllers
                 return validacion;
             }
 
-            var chofer = _choferService.ObtenerPorId(id);
+            var chofer = await _choferesApiClient.ObtenerPorId(id);
 
             if (chofer == null)
             {
+                TempData["Error"] = "Chofer no encontrado.";
                 return RedirectToAction("Index");
             }
 
@@ -107,7 +109,7 @@ namespace TicoBus.UI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(ChoferViewModel model)
+        public async Task<IActionResult> Edit(ChoferViewModel model)
         {
             var validacion = ValidarRol("Administrador");
 
@@ -130,39 +132,22 @@ namespace TicoBus.UI.Controllers
                 Correo = model.Correo
             };
 
-            var resultado = _choferService.Actualizar(chofer, out string mensaje);
+            var response = await _choferesApiClient.Actualizar(model.Id, chofer);
 
-            if (!resultado)
+            if (response == null || !response.Exitoso)
             {
-                ViewBag.Error = mensaje;
+                ViewBag.Error = response?.Mensaje ?? "No se pudo actualizar el chofer.";
                 return View(model);
             }
 
-            TempData["Exito"] = mensaje;
+            TempData["Exito"] = response.Mensaje;
             return RedirectToAction("Index");
         }
 
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var validacion = ValidarRol("Administrador");
-
-            if (validacion != null)
-            {
-                return validacion;
-            }
-
-            var resultado = _choferService.Eliminar(id, out string mensaje);
-
-            if (resultado)
-            {
-                TempData["Exito"] = mensaje;
-            }
-            else
-            {
-                TempData["Error"] = mensaje;
-            }
-
+            TempData["Error"] = "La eliminación de choferes no está habilitada en esta segunda entrega.";
             return RedirectToAction("Index");
         }
     }
