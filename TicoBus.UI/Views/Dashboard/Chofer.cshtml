@@ -1,10 +1,20 @@
-﻿@using TicoBus.Model
+﻿@using System.Text.Json
+@using TicoBus.Model
 
 @{
     ViewData["Title"] = "Panel del Chofer";
 
-    var viajesHoy = ViewBag.ViajesHoy as List<Viaje> ?? new List<Viaje>();
-    var proximoViaje = ViewBag.ProximoViaje as Viaje;
+    var viajesHoyJson = ViewBag.ViajesHoyJson as string ?? "[]";
+    JsonElement viajesHoy;
+
+    try
+    {
+        viajesHoy = JsonDocument.Parse(viajesHoyJson).RootElement.Clone();
+    }
+    catch
+    {
+        viajesHoy = JsonDocument.Parse("[]").RootElement.Clone();
+    }
 }
 
 <div class="page-header">
@@ -15,7 +25,6 @@
 </div>
 
 <div class="row g-4 mb-4">
-
     <div class="col-md-4">
         <div class="card stat-card bg-tb-primary">
             <div class="card-body">
@@ -45,39 +54,13 @@
             </div>
         </div>
     </div>
-
 </div>
-
-@if (proximoViaje != null)
-{
-    <div class="card app-card mb-4">
-        <div class="card-body">
-            <h5>Próximo viaje</h5>
-            <hr />
-
-            <p><strong>Ruta:</strong> @proximoViaje.Ruta?.Origen → @proximoViaje.Ruta?.Destino</p>
-            <p><strong>Unidad:</strong> @proximoViaje.Unidad?.Placa</p>
-            <p><strong>Salida:</strong> @proximoViaje.FechaHoraSalida.ToString("dd/MM/yyyy HH:mm")</p>
-
-            <a asp-controller="Viajes" asp-action="Index" class="btn btn-primary">
-                <i class="bi bi-map"></i> Ver viajes
-            </a>
-        </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-info shadow-sm">
-        No tiene viajes programados próximos.
-    </div>
-}
 
 <div class="card app-card">
     <div class="card-body table-wrapper">
-
         <h5 class="mb-3">Viajes asignados para hoy</h5>
 
-        @if (!viajesHoy.Any())
+        @if (viajesHoy.ValueKind != JsonValueKind.Array || viajesHoy.GetArrayLength() == 0)
         {
             <div class="alert alert-info">
                 No tiene viajes asignados para hoy.
@@ -99,28 +82,74 @@ else
                     </thead>
 
                     <tbody>
-                        @foreach (var item in viajesHoy)
+                        @foreach (var item in viajesHoy.EnumerateArray())
                         {
-                            var ocupados = item.Reservas?.Count(r => r.Activa) ?? 0;
-                            var capacidad = item.Unidad?.CapacidadPasajeros ?? 0;
+                            var ruta = item.TryGetProperty("ruta", out var rutaProp) ? rutaProp : default;
+                            var unidad = item.TryGetProperty("unidad", out var unidadProp) ? unidadProp : default;
+                            var reservas = item.TryGetProperty("reservas", out var reservasProp) ? reservasProp : default;
+
+                            var origen = ruta.ValueKind != JsonValueKind.Undefined && ruta.TryGetProperty("origen", out var origenProp)
+                                ? origenProp.GetString()
+                                : "";
+
+                            var destino = ruta.ValueKind != JsonValueKind.Undefined && ruta.TryGetProperty("destino", out var destinoProp)
+                                ? destinoProp.GetString()
+                                : "";
+
+                            var placa = unidad.ValueKind != JsonValueKind.Undefined && unidad.TryGetProperty("placa", out var placaProp)
+                                ? placaProp.GetString()
+                                : "";
+
+                            var capacidad = unidad.ValueKind != JsonValueKind.Undefined && unidad.TryGetProperty("capacidadPasajeros", out var capacidadProp)
+                                ? capacidadProp.GetInt32()
+                                : 0;
+
+                            var ocupados = 0;
+
+                            if (reservas.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var reserva in reservas.EnumerateArray())
+                                {
+                                    if (reserva.TryGetProperty("activa", out var activaProp) && activaProp.GetBoolean())
+                                    {
+                                        ocupados++;
+                                    }
+                                }
+                            }
+
+                            var salida = item.TryGetProperty("fechaHoraSalida", out var salidaProp)
+                                ? salidaProp.GetDateTime().ToString("HH:mm")
+                                : "";
+
+                            var llegada = item.TryGetProperty("fechaHoraLlegadaEstimada", out var llegadaProp)
+                                ? llegadaProp.GetDateTime().ToString("HH:mm")
+                                : "";
+
+                            var estado = item.TryGetProperty("estado", out var estadoProp)
+                                ? estadoProp.GetInt32()
+                                : 0;
 
                             <tr>
-                                <td>@item.Ruta?.Origen → @item.Ruta?.Destino</td>
-                                <td>@item.Unidad?.Placa</td>
-                                <td>@item.FechaHoraSalida.ToString("HH:mm")</td>
-                                <td>@item.FechaHoraLlegadaEstimada.ToString("HH:mm")</td>
+                                <td>@origen → @destino</td>
+                                <td>@placa</td>
+                                <td>@salida</td>
+                                <td>@llegada</td>
                                 <td>
-                                    @if (item.Estado == EstadoViaje.Programado)
+                                    @if (estado == 1)
                                     {
                                         <span class="badge bg-primary">Programado</span>
                                     }
-                                    else if (item.Estado == EstadoViaje.EnCurso)
+                                    else if (estado == 2)
                                     {
                                         <span class="badge bg-success">En curso</span>
                                     }
-                                    else if (item.Estado == EstadoViaje.Completado)
+                                    else if (estado == 3)
                                     {
                                         <span class="badge bg-secondary">Completado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Estado @estado</span>
                                     }
                                 </td>
                                 <td>@ocupados / @capacidad</td>
@@ -130,6 +159,5 @@ else
                 </table>
             </div>
         }
-
     </div>
 </div>
