@@ -1,0 +1,98 @@
+﻿@model TicoBus.UI.Models.PerfilViewModel
+
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<div class="page-header">
+    <div>
+        <h2>Mi Perfil</h2>
+        <p class="text-muted mb-0">Información de la cuenta y configuración de acceso.</p>
+    </div>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success shadow-sm">
+        @TempData["Exito"]
+    </div>
+}
+
+<div class="card app-card">
+    <div class="card-body">
+
+        <form asp-action="Index" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input asp-for="NombreUsuario" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Rol</label>
+                    <input asp-for="Rol" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nombre completo</label>
+                    <input asp-for="NombreCompleto" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fecha de creación</label>
+                    <input value="@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label asp-for="Correo" class="form-label">Correo electrónico</label>
+                    <input asp-for="Correo" class="form-control" />
+                    <span asp-validation-for="Correo" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h5>Cambiar contraseña</h5>
+            <p class="text-muted">Complete estos campos solo si desea cambiar su contraseña.</p>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ClaveActual" class="form-label">Clave actual</label>
+                    <input asp-for="ClaveActual" class="form-control" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="NuevaClave" class="form-label">Nueva clave</label>
+                    <input asp-for="NuevaClave" class="form-control" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="ConfirmarClave" class="form-label">Confirmar clave</label>
+                    <input asp-for="ConfirmarClave" class="form-control" />
+                    <span asp-validation-for="ConfirmarClave" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Guardar cambios
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

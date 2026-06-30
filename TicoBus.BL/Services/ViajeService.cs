@@ -52,7 +52,15 @@ namespace TicoBus.BL.Services
         {
             return _viajeRepository.ObtenerPorId(id);
         }
+        public List<Viaje> ListarPorChoferHoy(int choferId)
+        {
+            return _viajeRepository.ListarPorChoferHoy(choferId);
+        }
 
+        public Viaje? ObtenerProximoViajeChofer(int choferId)
+        {
+            return _viajeRepository.ObtenerProximoViajeChofer(choferId);
+        }
         public bool Agregar(Viaje viaje, out string mensaje)
         {
             if (viaje.FechaHoraLlegadaEstimada <= viaje.FechaHoraSalida)

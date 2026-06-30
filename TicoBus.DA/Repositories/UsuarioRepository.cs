@@ -23,7 +23,10 @@ namespace TicoBus.DA.Repositories
         {
             return _context.Usuarios.Any(u => u.NombreUsuario == nombreUsuario);
         }
-
+        public Usuario? ObtenerPorId(int id)
+        {
+            return _context.Usuarios.FirstOrDefault(u => u.Id == id);
+        }
         public void Actualizar(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);

@@ -20,7 +20,10 @@ namespace TicoBus.BL.Services
             _usuarioRepository = usuarioRepository;
             _correoService = correoService;
         }
-
+        public Chofer? ObtenerPorUsuarioId(int usuarioId)
+        {
+            return _choferRepository.ObtenerPorUsuarioId(usuarioId);
+        }
         public List<Chofer> Listar(string? filtro)
         {
             return _choferRepository.Listar(filtro);

@@ -10,5 +10,6 @@ namespace TicoBus.BL.Interfaces
         bool Actualizar(Chofer chofer, out string mensaje);
         bool TieneViajes(int choferId);
         bool Eliminar(int id, out string mensaje);
+        Chofer? ObtenerPorUsuarioId(int usuarioId);
     }
 }

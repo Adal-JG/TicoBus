@@ -83,7 +83,8 @@ namespace TicoBus.DA.Data
                     Rol = RolUsuario.Administrador,
                     IntentosFallidos = 0,
                     BloqueadoHasta = null,
-                    Activo = true
+                    Activo = true,
+                    FechaCreacion = new DateTime(2026, 1, 1)
                 }
             );
         }

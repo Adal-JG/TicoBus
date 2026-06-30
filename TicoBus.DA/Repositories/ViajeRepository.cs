@@ -55,7 +55,37 @@ namespace TicoBus.DA.Repositories
                     .ThenInclude(r => r.Pasajero)
                 .FirstOrDefault(v => v.Id == id);
         }
+        public List<Viaje> ListarPorChoferHoy(int choferId)
+        {
+            var hoy = DateTime.Today;
+            var manana = hoy.AddDays(1);
 
+            return _context.Viajes
+                .Include(v => v.Ruta)
+                .Include(v => v.Unidad)
+                .Include(v => v.Reservas)
+                .Where(v =>
+                    v.ChoferId == choferId &&
+                    v.FechaHoraSalida >= hoy &&
+                    v.FechaHoraSalida < manana &&
+                    v.Estado != EstadoViaje.Cancelado)
+                .OrderBy(v => v.FechaHoraSalida)
+                .ToList();
+        }
+
+        public Viaje? ObtenerProximoViajeChofer(int choferId)
+        {
+            return _context.Viajes
+                .Include(v => v.Ruta)
+                .Include(v => v.Unidad)
+                .Include(v => v.Reservas)
+                .Where(v =>
+                    v.ChoferId == choferId &&
+                    v.FechaHoraSalida >= DateTime.Now &&
+                    v.Estado == EstadoViaje.Programado)
+                .OrderBy(v => v.FechaHoraSalida)
+                .FirstOrDefault();
+        }
         public bool ChoferOcupado(int choferId, DateTime salida, DateTime llegada, int viajeIdExcluir = 0)
         {
             return _context.Viajes.Any(v =>
